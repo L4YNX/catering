@@ -742,3 +742,44 @@ details p {
     display: none
   }
 }
+
+@media (max-width: 720px){
+  .controls{
+    flex-direction: column;
+    align-items: stretch;
+    gap: .75rem;
+  }
+
+  .seg{
+    width: 100%;
+    justify-content: center; /* opcjonalnie */
+  }
+
+  .search{
+    width: 100%;
+  }
+
+  .search input{
+    width: 100%;
+  }
+}
+@media (max-width: 720px){
+  .controls{
+    flex-direction: column;
+    align-items: stretch;
+    gap: .75rem;
+  }
+
+  .seg{
+    width: 100%;
+    justify-content: center; /* opcjonalnie */
+  }
+
+  .search{
+    width: 100%;
+  }
+
+  .search input{
+    width: 100%;
+  }
+}
