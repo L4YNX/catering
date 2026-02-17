@@ -4,8 +4,8 @@ const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 function money(n){ return `${n} zł`; }
 
 // ====== SETTINGS ======
-const WA_NUMBER = "48000000000"; // <-- podmień na swój numer (bez +, bez spacji)
-const BOOKED = ["2026-02-20", "2026-02-21"]; // ZAJĘTE TERMINY (YYYY-MM-DD)
+const WA_NUMBER = "48508014420"; // <-- podmień na swój numer (bez +, bez spacji)
+const BOOKED = [/*rrrr-mm-dd*/"2026-02-20", "2026-02-21"]; // ZAJĘTE TERMINY (YYYY-MM-DD)
 
 // Tag labels (do wyświetlania)
 const TAG_LABELS = {
