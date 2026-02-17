@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Paterka</title>
+  <icon href="assets/logo.png" />
+  <meta name="description" content="Delikatna, jasna strona z katalogiem pater. Zamów przez WhatsApp / telefon." />
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="app.js"></script>
+</head>
+
+<body>
+  <header class="top" id="top">
+    <div class="container top__inner">
+      <a class="brand" href="#top"><img class="logo" src="assets/logo.png" alt="Logo Paterki"></a>
+
+      <nav class="nav">
+        <a href="#katalog">Katalog</a>
+        <a href="#jak">Jak zamówić</a>
+        <a href="#faq">FAQ</a>
+        <a class="btn btn--small" style="color: white;" href="tel:+48000000000">Zadzwoń</a>
+      </nav>
+
+      <button class="orderBtn" id="openPanel" aria-label="Podgląd zamówienia">
+        Zamówienie <span id="count">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero__copy">
+        <p class="eyebrow">Na zimno • na ciepło • wege</p>
+        <h1>Paterki, <span>gotowe do podania</span>.</h1>
+        <p class="lead">
+          Wybierz Paterke/Koryto, wpisz termin i wyślij zamówienie przez WhatsApp (albo zadzwoń).
+        </p>
+
+        <div class="hero__cta">
+          <a class="btn" href="#katalog">Zobacz katalog</a>
+        </div>
+
+        <div class="badges">
+          <span class="badge">Odbiór / dowóz</span>
+          <span class="badge">Zamówienia z wyprzedzeniem</span>
+          <span class="badge">Alergeny na życzenie</span>
+        </div>
+      </div>
+
+      <div class="hero__card">
+        <div class="heroCard__top">
+          <strong>Najpopularniejsze</strong>
+          <span class="muted">dla 6–8 osób</span>
+        </div>
+
+        <div class="miniList">
+          <div class="miniItem">
+            <div class="dot dot--mint"></div>
+            <div>
+              <strong>Mini kanapki mix</strong>
+              <div class="muted">klasyk • na zimno</div>
+            </div>
+            <div class="price">119 zł</div>
+          </div>
+
+          <div class="miniItem">
+            <div class="dot dot--peach"></div>
+            <div>
+              <strong>Mini burgery</strong>
+              <div class="muted">na ciepło</div>
+            </div>
+            <div class="price">189 zł</div>
+          </div>
+
+          <div class="miniItem">
+            <div class="dot dot--lav"></div>
+            <div>
+              <strong>Słodka patera</strong>
+              <div class="muted">mini desery</div>
+            </div>
+            <div class="price">159 zł</div>
+          </div>
+        </div>
+
+        <button class="btn btn--small btn--full" id="openPanel2">Otwórz zamówienie</button>
+      </div>
+    </section>
+
+    <section class="controls">
+      <div class="seg" role="tablist" aria-label="Filtry">
+        <button class="seg__btn is-active" data-filter="all">Wszystko</button>
+        <button class="seg__btn" data-filter="cold">Na zimno</button>
+        <button class="seg__btn" data-filter="hot">Na ciepło</button>
+        <button class="seg__btn" data-filter="vege">Wege</button>
+      </div>
+
+      <div class="search">
+        <input id="q" placeholder="Szukaj (np. patera nr. 1, koryto nr. 1)..." />
+      </div>
+    </section>
+
+    <section id="katalog" class="catalog">
+      <div class="catalog__head">
+        <h2>Katalog</h2>
+        <p class="muted">Rozwiń kategorię i dodaj pozycje do zamówienia.</p>
+      </div>
+
+      <div class="acc">
+        <details open>
+          <summary>Na zimno <span class="accCount" id="countCold">(0)</span></summary>
+          <div class="grid" id="gridCold"></div>
+        </details>
+
+        <details>
+          <summary>Na ciepło <span class="accCount" id="countHot">(0)</span></summary>
+          <div class="grid" id="gridHot"></div>
+        </details>
+
+        <details>
+          <summary>Wege <span class="accCount" id="countVege">(0)</span></summary>
+          <div class="grid" id="gridVege"></div>
+        </details>
+      </div>
+    </section>
+
+    <section id="jak" class="how">
+      <div class="how__grid">
+        <div class="howCard">
+          <strong>1) Wybierz patery</strong>
+          <p class="muted">Dodaj do zamówienia i dobierz ilości.</p>
+        </div>
+        <div class="howCard">
+          <strong>2) Ustal termin</strong>
+          <p class="muted">Data, godzina, odbiór lub dowóz.</p>
+        </div>
+        <div class="howCard">
+          <strong>3) Wyślij</strong>
+          <p class="muted">WhatsApp / SMS / telefon — jak wolisz.</p>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>Pro tip:</strong> dopisz alergie i ewentualne zamienniki w wiadomości.
+      </div>
+    </section>
+
+    <section id="faq" class="faq">
+      <h2>FAQ</h2>
+      <div class="faq__grid">
+        <details open>
+          <summary>Na ile osób jest jedna patera?</summary>
+          <p>Zależnie od Paterki/Koryta (np. 6–8 osób). Informacja jest w każdej pozycji.</p>
+        </details>
+        <details>
+          <summary>Czy mogę zmienić skład?</summary>
+          <p>Tak, w miarę dostępności — dopisz w wiadomości.</p>
+        </details>
+        <details>
+          <summary>Jak działa “na ciepło”?</summary>
+          <p>Odbiór o określonej godzinie lub dowóz w pojemnikach termo.</p>
+        </details>
+        <details>
+          <summary>Jak płacę?</summary>
+          <p>BLIK / karta / gotówka</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <aside class="panel" id="panel" aria-hidden="true">
+    <div class="panel__top">
+      <div>
+        <strong>Zamówienie</strong>
+        <div class="muted small">Uzupełnij termin i wyślij WhatsApp</div>
+      </div>
+      <button class="x" id="closePanel" aria-label="Zamknij">✕</button>
+    </div>
+
+    <div class="panel__meta">
+      <label class="field">
+        <span>Data</span>
+        <input id="date" type="date" />
+        <div class="warn" id="dateWarn" aria-live="polite"></div>
+      </label>
+
+      <label class="field">
+        <span>Godzina</span>
+        <input id="time" type="time" />
+      </label>
+
+      <label class="field field--full">
+        <span>Odbiór / dowóz + adres</span>
+        <input id="where" placeholder="np. ul. X 12/3, Zory(brak adresu oznacza odbiór osobisty)" />
+      </label>
+
+      <label class="field field--full">
+        <span>Uwagi / alergie</span>
+        <input id="notes" placeholder="np. bez orzechów, zamiana na wege…" />
+      </label>
+    </div>
+
+    <div class="panel__items" id="items"></div>
+
+    <div class="panel__bottom">
+      <div class="totalRow">
+        <span class="muted">Suma</span>
+        <strong id="total">0 zł</strong>
+      </div>
+
+      <div class="btnRow">
+        <button class="btn btn--ghost" id="copy">Kopiuj</button>
+        <button class="btn" id="wa">Wyślij WhatsApp</button>
+      </div>
+
+      <button class="linkBtn" id="clear">Wyczyść zamówienie</button>
+      <p class="muted tiny">To jest tylko i wyłacznie wysłanie wiadomości przez WhatsApp, nie potwierdzenie ze zamówienie zostało złożone.</p>
+    </div>
+  </aside>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span>© <span id="year"></span> Paterka</span>
+      <span class="muted">Kontakt • Alergeny • Regulamin</span>
+    </div>
+  </footer>
+</body>
+</html>
