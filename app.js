@@ -8,6 +8,12 @@ const BOOKED = [
   "2026-02-21",
 ];
 
+const TAG_LABELS = {
+  cold: "na zimno",
+  hot: "na ciepło",
+  vege: "wege",
+};
+
 // Twoje produkty — możesz mieć tu 20+ pozycji
 const PRODUCTS = [
   {
@@ -121,7 +127,11 @@ function cardHTML(p){
         </div>
         <div class="sub">${p.note}</div>
         <div class="metaRow">
-          ${p.tags.map(t => `<span class="pill">${t}</span>`).join("")}
+          ${p.tags
+            .map(t => TAG_LABELS[t])
+            .filter(Boolean)
+            .map(lbl => `<span class="pill">${lbl}</span>`)
+            .join("")}
         </div>
         <div class="buyRow">
           <span class="muted">Porcja: <strong>${p.serves}</strong></span>
@@ -347,8 +357,21 @@ function validateForm(){
 }
 whereEl.addEventListener("input", validateForm);
 
-// init
-render();
-updateUI();
-validateDate();
-validateForm();
+alert("app.js działa ✅");
+
+// --- HARD INIT (pewniak przy defer) ---
+(function init(){
+  // otwórz wszystkie sekcje, żeby od razu było widać katalog
+  Object.values(accDetails).forEach(d => { if(d) d.open = true; });
+
+  // ustaw startowo "Wszystko" (ważne jeśli gdzieś zostaje inna wartość)
+  active = "all";
+
+  // pierwszy render
+  render();
+  updateUI();
+  validateDate();
+
+  // drugi render po chwili (Safari/Chrome czasem dociąga dopiero po layout)
+  setTimeout(render, 0);
+})();
