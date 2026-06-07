@@ -3,25 +3,9 @@ const $ = (id) => document.getElementById(id);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 function money(n){ return `${n} zł`; }
 
-// ====== SETTINGS ======
-const WA_NUMBER = "48508014420"; // <-- podmień na swój numer (bez +, bez spacji)
-const BOOKED = [/*rrrr-mm-dd*/"2026-02-20", "2026-02-21"]; // ZAJĘTE TERMINY (YYYY-MM-DD)
-
-// Tag labels (do wyświetlania)
-const TAG_LABELS = {
-  cold: "na zimno",
-  hot: "na ciepło",
-  vege: "wege",
-};
-
-// ====== DATA ======
-const PRODUCTS = [
-  { id: 1, name: "Patera nr. 1", tags:["cold"], serves:"4–6", price:99,  note:"Klasyczna, dla każdego.", img:"assets/patera1.jpg" },
-  { id: 2, name: "Patera nr. 2", tags:["cold"], serves:"6–8", price:119, note:"Klasyczna, dla każdego.", img:"assets/patera1.jpg" },
-  { id: 3, name: "Patera nr. 3", tags:["cold"], serves:"4–6", price:99,  note:"Klasyczna, dla każdego.", img:"assets/patera1.jpg" },
-  { id: 4, name: "Patera nr. 4", tags:["cold"], serves:"6–8", price:129, note:"Klasyczna, dla każdego.", img:"assets/patera1.jpg" },
-  { id: 5, name: "Koryto nr. 1", tags:["hot"],  serves:"4–6", price:99,  note:"Klasyczne koryto, dla każdego.", img:"assets/patera1.jpg" },
-];
+// ====== SETTINGS FROM data.js ======
+const WA_NUMBER = SITE_CONFIG.phone; // numer z data.js, bez + i bez spacji
+const BOOKED = BOOKED_DATES; // zajęte terminy z data.js
 
 // ====== DOM REFERENCES (SAFE) ======
 const yearEl = $("year");
@@ -55,6 +39,7 @@ const dateEl = $("date");
 const timeEl = $("time");
 const warnEl = $("dateWarn");
 const waBtn  = $("wa");
+const copyBtn = $("copy");
 const whereEl = $("where");
 
 // ====== STATE ======
@@ -110,7 +95,7 @@ function cardHTML(p){
 function render(){
   const term = (q?.value || "").trim().toLowerCase();
 
-  const baseList = PRODUCTS.filter(p => {
+  const baseList = PRODUCTS.filter(p => p.available !== false).filter(p => {
     const okQ = !term || (p.name + " " + p.note).toLowerCase().includes(term);
     const okF = active === "all" || p.tags.includes(active);
     return okQ && okF;
@@ -158,10 +143,13 @@ function updateUI(){
   const totalEl = $("total");
   if (totalEl) totalEl.textContent = money(total());
 
+  validateForm();
+
   if(!items) return;
 
   if(cart.size === 0){
     items.innerHTML = `<div class="muted">Koszyk pusty. Dodaj patery z katalogu.</div>`;
+    validateForm();
     return;
   }
 
@@ -194,39 +182,29 @@ function validateDate(){
   if(booked){
     warnEl && (warnEl.textContent = "⛔ Ten termin jest zajęty. Wybierz inną datę.");
     warnEl?.classList.add("is-show");
-    if(waBtn){
-      waBtn.disabled = true;
-      waBtn.style.opacity = ".55";
-      waBtn.style.cursor = "not-allowed";
-    }
   } else {
     warnEl && (warnEl.textContent = "");
     warnEl?.classList.remove("is-show");
-    if(waBtn){
-      waBtn.disabled = false;
-      waBtn.style.opacity = "";
-      waBtn.style.cursor = "";
-    }
   }
+
+  return !booked;
 }
 
-// ustaw min. na jutro + domyślnie jutro
+// ustaw min. na jutro, ale nie ustawiaj domyślnej daty — data jest opcjonalna
 if(dateEl){
   const d = new Date();
   d.setDate(d.getDate() + 1);
-  const min = d.toISOString().slice(0,10);
-  dateEl.min = min;
-  if(!dateEl.value) dateEl.value = min;
+  dateEl.min = d.toISOString().slice(0,10);
 }
 
-dateEl?.addEventListener("change", validateDate);
-timeEl?.addEventListener("change", validateDate);
+dateEl?.addEventListener("change", validateForm);
+timeEl?.addEventListener("change", validateForm);
 
 // ====== ORDER TEXT ======
 function buildText(){
-  const date = dateEl?.value || "[data]";
-  const time = timeEl?.value || "[godzina]";
-  const where = $("where")?.value || "[odbiór/dowóz + adres]";
+  const date = dateEl?.value || "";
+  const time = timeEl?.value || "";
+  const where = $("where")?.value || "";
   const notes = $("notes")?.value || "";
 
   const lines = ["Zamówienie – patery:", ""];
@@ -240,9 +218,19 @@ function buildText(){
 
   lines.push("");
   lines.push(`Suma: ${money(total())}`);
-  lines.push(`Termin: ${date} ${time}`);
-  lines.push(`Odbiór/dowóz: ${where}`);
-  if(notes) lines.push(`Uwagi: ${notes}`);
+
+  if(date || time){
+    lines.push(`Termin: ${date || "bez daty"}${time ? " " + time : ""}`);
+  }
+
+  if(where){
+    lines.push(`Odbiór/dowóz: ${where}`);
+  }
+
+  if(notes){
+    lines.push(`Uwagi: ${notes}`);
+  }
+
   return lines.join("\n");
 }
 
@@ -293,6 +281,8 @@ $("closePanel")?.addEventListener("click", closePanel);
 
 // actions
 $("copy")?.addEventListener("click", async () => {
+  if(!validateForm()) return;
+
   try{
     await navigator.clipboard.writeText(buildText());
     alert("Skopiowano treść zamówienia.");
@@ -302,8 +292,7 @@ $("copy")?.addEventListener("click", async () => {
 });
 
 $("wa")?.addEventListener("click", () => {
-  validateDate();
-  if(waBtn?.disabled) return;
+  if(!validateForm()) return;
 
   const txt = encodeURIComponent(buildText());
   window.open(`https://wa.me/${WA_NUMBER}?text=${txt}`, "_blank");
@@ -320,12 +309,72 @@ $("addBest")?.addEventListener("click", () => {
   openPanel();
 });
 
-// validateForm (opcjonalne)
+// Formularz jest wymagany — bez daty, godziny i adresu nie można skopiować ani wysłać zamówienia.
 function validateForm(){
-  const okWhere = (whereEl?.value || "").trim().length >= 5;
-  if(waBtn) waBtn.disabled = waBtn.disabled || !okWhere;
+  const hasProducts = cart.size > 0;
+  const hasDate = (dateEl?.value || "").trim().length > 0;
+  const hasTime = (timeEl?.value || "").trim().length > 0;
+  const hasWhere = (whereEl?.value || "").trim().length >= 5;
+  const dateOk = validateDate();
+  const canSend = hasProducts && hasDate && hasTime && hasWhere && dateOk;
+
+  [waBtn, copyBtn].forEach(btn => {
+    if(!btn) return;
+    btn.disabled = !canSend;
+  });
+
+  return canSend;
 }
 whereEl?.addEventListener("input", validateForm);
+dateEl?.addEventListener("input", validateForm);
+timeEl?.addEventListener("input", validateForm);
+
+// ===== FB/IG GALLERY (from our API) =====
+async function loadFB(){
+  const grid = document.getElementById("fbGrid");
+  const pageLink = document.getElementById("fbPageLink");
+  if(!grid) return;
+
+  try{
+    // TU będzie URL do Twojego backendu (Cloudflare Worker)
+    const API_URL = "https://TWOJ-WORKER.workers.dev/posts";
+
+    const res = await fetch(API_URL, { cache: "no-store" });
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+
+    if(pageLink && data.page_url) pageLink.href = data.page_url;
+
+    const posts = (data.posts || []).slice(0, 6);
+    if(posts.length === 0){
+      grid.innerHTML = `<div class="muted">Brak postów do wyświetlenia.</div>`;
+      return;
+    }
+
+    grid.innerHTML = posts.map(p => `
+      <a class="fbCard" href="${p.permalink_url}" target="_blank" rel="noopener">
+        <div class="fbImg" style="background-image:url('${p.image || ""}')"></div>
+        <div class="fbBody">
+          <div class="fbText">${escapeHTML(p.message || "Zobacz post")}</div>
+          <div class="fbMeta">${new Date(p.created_time).toLocaleDateString("pl-PL")}</div>
+        </div>
+      </a>
+    `).join("");
+
+  }catch(err){
+    grid.innerHTML = `<div class="muted">Nie udało się załadować galerii.</div>`;
+    console.warn(err);
+  }
+}
+
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
+}
+
+// odpal po starcie
+window.addEventListener("pageshow", loadFB);
 
 // ====== BOOT (100% reliable) ======
 function boot(){

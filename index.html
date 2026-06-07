@@ -4,9 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Paterka</title>
-  <icon href="assets/logo.png" />
+  <link rel="icon" href="assets/logo.png" />
   <meta name="description" content="Delikatna, jasna strona z katalogiem pater. Zamów przez WhatsApp / telefon." />
   <link rel="stylesheet" href="styles.css" />
+  <script defer src="./data.js"></script>
   <script defer src="./app.js"></script>
 </head>
 
@@ -29,13 +30,25 @@
   </header>
 
   <main class="container">
-    <section class="hero">
+    <!-- HERO: teraz 1-kolumnowy (galeria szeroko) -->
+    <section class="hero hero--wide">
       <div class="hero__copy">
         <p class="eyebrow">Na zimno • na ciepło • wege</p>
         <h1>Paterki, <span>gotowe do podania</span>.</h1>
         <p class="lead">
           Wybierz Paterke/Koryto, wpisz termin i wyślij zamówienie przez WhatsApp (albo zadzwoń).
         </p>
+
+        <section class="fbGallery" aria-label="Galeria z Facebooka">
+          <div class="fbHead">
+            <h3>Galeria</h3>
+            <a class="fbLink" href="#" id="fbPageLink" target="_blank" rel="noopener">Zobacz na Facebooku →</a>
+          </div>
+
+          <div class="fbGrid" id="fbGrid">
+            <div class="muted">Ładowanie…</div>
+          </div>
+        </section>
 
         <div class="hero__cta">
           <a class="btn" href="#katalog">Zobacz katalog</a>
@@ -47,7 +60,10 @@
           <span class="badge">Alergeny na życzenie</span>
         </div>
       </div>
+    </section>
 
+    <!-- NAJPOPULARNIEJSZE: przeniesione POD HERO -->
+    <section class="popSection">
       <div class="hero__card">
         <div class="heroCard__top">
           <strong>Najpopularniejsze</strong>
@@ -172,7 +188,7 @@
     <div class="panel__top">
       <div>
         <strong>Zamówienie</strong>
-        <div class="muted small">Uzupełnij termin i wyślij WhatsApp</div>
+        <div class="muted small">Uzupełnij datę, godzinę i adres, żeby wysłać zamówienie</div>
       </div>
       <button class="x" id="closePanel" aria-label="Zamknij">✕</button>
     </div>
@@ -180,18 +196,18 @@
     <div class="panel__meta">
       <label class="field">
         <span>Data</span>
-        <input id="date" type="date" />
+        <input id="date" type="date" required />
         <div class="warn" id="dateWarn" aria-live="polite"></div>
       </label>
 
       <label class="field">
         <span>Godzina</span>
-        <input id="time" type="time" />
+        <input id="time" type="time" required />
       </label>
 
       <label class="field field--full">
         <span>Odbiór / dowóz + adres</span>
-        <input id="where" placeholder="np. ul. X 12/3, Zory(brak adresu oznacza odbiór osobisty)" />
+        <input id="where" placeholder="np. ul. X 12/3, Żory" required />
       </label>
 
       <label class="field field--full">
@@ -209,12 +225,12 @@
       </div>
 
       <div class="btnRow">
-        <button class="btn btn--ghost" id="copy">Kopiuj</button>
-        <button class="btn" id="wa">Wyślij WhatsApp</button>
+        <button class="btn btn--ghost" id="copy" disabled>Kopiuj</button>
+        <button class="btn" id="wa" disabled>Wyślij WhatsApp</button>
       </div>
 
       <button class="linkBtn" id="clear">Wyczyść zamówienie</button>
-      <p class="muted tiny">To jest tylko i wyłacznie wysłanie wiadomości przez WhatsApp, nie potwierdzenie ze zamówienie zostało złożone.</p>
+      <p class="muted tiny">To jest tylko wysłanie wiadomości przez WhatsApp — nie oznacza automatycznego potwierdzenia zamówienia.</p>
     </div>
   </aside>
 
