@@ -12,21 +12,30 @@ const yearEl = $("year");
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 const grids = {
-  cold: $("gridCold"),
-  hot:  $("gridHot"),
-  vege: $("gridVege"),
+  cold:  $("gridCold"),
+  hot:   $("gridHot"),
+  vege:  $("gridVege"),
+  salad: $("gridSalad"),
+  sweet: $("gridSweet"),
+  plyta: $("gridPlyta"),
 };
 
 const counters = {
-  cold: $("countCold"),
-  hot:  $("countHot"),
-  vege: $("countVege"),
+  cold:  $("countCold"),
+  hot:   $("countHot"),
+  vege:  $("countVege"),
+  salad: $("countSalad"),
+  sweet: $("countSweet"),
+  plyta: $("countPlyta"),
 };
 
 const accDetails = {
-  cold: grids.cold?.closest("details") ?? null,
-  hot:  grids.hot?.closest("details") ?? null,
-  vege: grids.vege?.closest("details") ?? null,
+  cold:  grids.cold?.closest("details") ?? null,
+  hot:   grids.hot?.closest("details") ?? null,
+  vege:  grids.vege?.closest("details") ?? null,
+  sweet: grids.sweet?.closest("details") ?? null,
+  salad: grids.salad?.closest("details") ?? null,
+  plyta: grids.plyta?.closest("details") ?? null,
 };
 
 const q = $("q");
@@ -35,9 +44,10 @@ const segBtns = $$(".seg__btn");
 const panel = $("panel");
 const items = $("items");
 
-const dateEl = $("date");
-const timeEl = $("time");
-const warnEl = $("dateWarn");
+const dateEl    = $("date");
+const timeHourEl = $("timeHour");
+const timeMinEl  = $("timeMin");
+const warnEl    = $("dateWarn");
 const waBtn  = $("wa");
 const copyBtn = $("copy");
 const whereEl = $("where");
@@ -57,7 +67,7 @@ function total(){
 
 // ====== CARD RENDER ======
 function cardHTML(p){
-  const typeLabel = p.tags.includes("hot") ? "na ciepło" : "na zimno";
+  const typeLabel = TAG_LABELS[p.tags[0]] || p.tags[0];
   const bg = p.img ? `style="background-image:url('${p.img}');"` : "";
 
   const pills = p.tags
@@ -83,7 +93,7 @@ function cardHTML(p){
         ${pills ? `<div class="metaRow">${pills}</div>` : ""}
 
         <div class="buyRow">
-          <span class="muted">Porcja: <strong>${p.serves}</strong></span>
+          <span class="muted"></strong></span>
           <button class="add" data-add="${p.id}">Dodaj</button>
         </div>
       </div>
@@ -96,7 +106,7 @@ function render(){
   const term = (q?.value || "").trim().toLowerCase();
 
   const baseList = PRODUCTS.filter(p => p.available !== false).filter(p => {
-    const okQ = !term || (p.name + " " + p.note).toLowerCase().includes(term);
+    const okQ = !term || p.name.toLowerCase().includes(term);
     const okF = active === "all" || p.tags.includes(active);
     return okQ && okF;
   });
@@ -104,7 +114,14 @@ function render(){
   function fill(key, filterFn){
     const grid = grids[key];
     const counter = counters[key];
-    if (!grid && !counter) return;
+    const det = accDetails[key];
+    const filterBtn = segBtns.find(b => b.dataset.filter === key);
+
+    const totalInCategory = PRODUCTS.filter(p => p.available !== false).filter(filterFn).length;
+    const hidden = totalInCategory === 0;
+    if (det) det.style.display = hidden ? "none" : "";
+    if (filterBtn) filterBtn.style.display = hidden ? "none" : "";
+    if (hidden) return;
 
     const list = baseList.filter(filterFn);
     if (grid) grid.innerHTML = list.map(cardHTML).join("") || `<div class="muted">Brak pozycji.</div>`;
@@ -114,6 +131,9 @@ function render(){
   fill("cold", p => p.tags.includes("cold") && !p.tags.includes("hot"));
   fill("hot",  p => p.tags.includes("hot"));
   fill("vege", p => p.tags.includes("vege"));
+  fill("salad", p => p.tags.includes("salad"));
+  fill("sweet", p => p.tags.includes("sweet"));
+  fill("plyta", p => p.tags.includes("plyta"));
 
   // otwieranie sekcji zależnie od filtra
   if (active === "all"){
@@ -198,12 +218,11 @@ if(dateEl){
 }
 
 dateEl?.addEventListener("change", validateForm);
-timeEl?.addEventListener("change", validateForm);
 
 // ====== ORDER TEXT ======
 function buildText(){
   const date = dateEl?.value || "";
-  const time = timeEl?.value || "";
+  const time = (timeHourEl?.value && timeMinEl?.value) ? `${timeHourEl.value}:${timeMinEl.value}` : "";
   const where = $("where")?.value || "";
   const notes = $("notes")?.value || "";
 
@@ -224,7 +243,7 @@ function buildText(){
   }
 
   if(where){
-    lines.push(`Odbiór/dowóz: ${where}`);
+    lines.push(`${where}`);
   }
 
   if(notes){
@@ -236,6 +255,11 @@ function buildText(){
 
 // ====== EVENTS (SAFE) ======
 document.addEventListener("click", (e) => {
+  if(e.target.classList.contains("sub")){
+    e.target.classList.toggle("is-expanded");
+    return;
+  }
+
   const add = e.target?.getAttribute?.("data-add");
   if(add){
     const id = Number(add);
@@ -303,17 +327,11 @@ $("clear")?.addEventListener("click", () => {
   updateUI();
 });
 
-$("addBest")?.addEventListener("click", () => {
-  cart.set(1, (cart.get(1)||0) + 1);
-  updateUI();
-  openPanel();
-});
-
 // Formularz jest wymagany — bez daty, godziny i adresu nie można skopiować ani wysłać zamówienia.
 function validateForm(){
   const hasProducts = cart.size > 0;
   const hasDate = (dateEl?.value || "").trim().length > 0;
-  const hasTime = (timeEl?.value || "").trim().length > 0;
+  const hasTime = (timeHourEl?.value || "").length > 0 && (timeMinEl?.value || "").length > 0;
   const hasWhere = (whereEl?.value || "").trim().length >= 5;
   const dateOk = validateDate();
   const canSend = hasProducts && hasDate && hasTime && hasWhere && dateOk;
@@ -327,7 +345,8 @@ function validateForm(){
 }
 whereEl?.addEventListener("input", validateForm);
 dateEl?.addEventListener("input", validateForm);
-timeEl?.addEventListener("input", validateForm);
+timeHourEl?.addEventListener("change", validateForm);
+timeMinEl?.addEventListener("change", validateForm);
 
 // ===== FB/IG GALLERY (from our API) =====
 async function loadFB(){
@@ -337,7 +356,7 @@ async function loadFB(){
 
   try{
     // TU będzie URL do Twojego backendu (Cloudflare Worker)
-    const API_URL = "https://TWOJ-WORKER.workers.dev/posts";
+    const API_URL = "https://www.facebook.com/justyna.obara?locale=pl_PL";
 
     const res = await fetch(API_URL, { cache: "no-store" });
     if(!res.ok) throw new Error("HTTP " + res.status);
@@ -376,17 +395,70 @@ function escapeHTML(s){
 // odpal po starcie
 window.addEventListener("pageshow", loadFB);
 
+// ====== TIME SELECTS ======
+function fillTimeOptions(){
+  if(!timeHourEl || !timeMinEl) return;
+  if(timeHourEl.options.length > 1) return;
+  for(let h = 8; h <= 21; h++){
+    const opt = document.createElement("option");
+    opt.value = String(h).padStart(2, "0");
+    opt.textContent = String(h).padStart(2, "0");
+    timeHourEl.appendChild(opt);
+  }
+  [0, 15, 30, 45].forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = String(m).padStart(2, "0");
+    opt.textContent = String(m).padStart(2, "0");
+    timeMinEl.appendChild(opt);
+  });
+}
+
+// ====== POPULAR ======
+function renderPopular(){
+  const list = document.getElementById("popularList");
+  if(!list) return;
+
+  const popular = PRODUCTS.filter(p => p.popular && p.available !== false);
+  if(popular.length === 0){
+    list.innerHTML = `<div class="muted">Brak pozycji.</div>`;
+    return;
+  }
+
+  list.innerHTML = popular.map(p => {
+    const labels = p.tags.map(t => TAG_LABELS[t]).filter(Boolean).join(" • ");
+    return `
+      <div class="miniItem">
+        <div class="dot"></div>
+        <div>
+          <strong>${p.name}</strong>
+          <div class="muted">${labels}</div>
+        </div>
+        <div class="price">${money(p.price)}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+// ====== SCROLL TO TOP ======
+const toTopBtn = $("toTop");
+window.addEventListener("scroll", () => {
+  toTopBtn?.classList.toggle("is-visible", window.scrollY > 300);
+}, { passive: true });
+toTopBtn?.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
 // ====== BOOT (100% reliable) ======
 function boot(){
-  // otwórz wszystkie sekcje + ustaw "all"
   Object.values(accDetails).forEach(d => { if(d) d.open = true; });
   setFilter("all");
 
+  fillTimeOptions();
+  renderPopular();
   updateUI();
   validateDate();
   validateForm();
 
-  // “kick” po layout
   requestAnimationFrame(render);
 }
 

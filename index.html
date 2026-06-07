@@ -17,7 +17,7 @@
       <a class="brand" href="#top"><img class="logo" src="assets/logo.png" alt="Logo Paterki"></a>
 
       <nav class="nav">
-        <a href="#katalog">Katalog</a>
+        <a href="#katalog">Menu</a>
         <a href="#jak">Jak zamówić</a>
         <a href="#faq">FAQ</a>
         <a class="btn btn--small" style="color: white;" href="tel:+48508014420">Zadzwoń</a>
@@ -33,7 +33,7 @@
     <!-- HERO: teraz 1-kolumnowy (galeria szeroko) -->
     <section class="hero hero--wide">
       <div class="hero__copy">
-        <p class="eyebrow">Na zimno • na ciepło • wege</p>
+        <p class="eyebrow">Na zimno • na ciepło • wege • na słodko</p>
         <h1>Paterki, <span>gotowe do podania</span>.</h1>
         <p class="lead">
           Wybierz Paterke/Koryto, wpisz termin i wyślij zamówienie przez WhatsApp (albo zadzwoń).
@@ -42,7 +42,7 @@
         <section class="fbGallery" aria-label="Galeria z Facebooka">
           <div class="fbHead">
             <h3>Galeria</h3>
-            <a class="fbLink" href="#" id="fbPageLink" target="_blank" rel="noopener">Zobacz na Facebooku →</a>
+            <a class="fbLink" href="https://www.facebook.com/justyna.obara?locale=pl_PL" id="fbPageLink" target="_blank" rel="noopener">Zobacz na Facebooku →</a>
           </div>
 
           <div class="fbGrid" id="fbGrid">
@@ -51,7 +51,7 @@
         </section>
 
         <div class="hero__cta">
-          <a class="btn" href="#katalog">Zobacz katalog</a>
+          <a class="btn" href="#katalog">Zobacz menu</a>
         </div>
 
         <div class="badges">
@@ -67,37 +67,9 @@
       <div class="hero__card">
         <div class="heroCard__top">
           <strong>Najpopularniejsze</strong>
-          <span class="muted">dla 6–8 osób</span>
         </div>
 
-        <div class="miniList">
-          <div class="miniItem">
-            <div class="dot dot--mint"></div>
-            <div>
-              <strong>Mini kanapki mix</strong>
-              <div class="muted">klasyk • na zimno</div>
-            </div>
-            <div class="price">119 zł</div>
-          </div>
-
-          <div class="miniItem">
-            <div class="dot dot--peach"></div>
-            <div>
-              <strong>Mini burgery</strong>
-              <div class="muted">na ciepło</div>
-            </div>
-            <div class="price">189 zł</div>
-          </div>
-
-          <div class="miniItem">
-            <div class="dot dot--lav"></div>
-            <div>
-              <strong>Słodka patera</strong>
-              <div class="muted">mini desery</div>
-            </div>
-            <div class="price">159 zł</div>
-          </div>
-        </div>
+        <div class="miniList" id="popularList"></div>
 
         <button class="btn btn--small btn--full" id="openPanel2">Otwórz zamówienie</button>
       </div>
@@ -109,6 +81,9 @@
         <button class="seg__btn" data-filter="cold">Na zimno</button>
         <button class="seg__btn" data-filter="hot">Na ciepło</button>
         <button class="seg__btn" data-filter="vege">Wege</button>
+        <button class="seg__btn" data-filter="sweet">Na słodko</button>
+        <button class="seg__btn" data-filter="salad">Sałatki</button>
+        <button class="seg__btn" data-filter="plyta">Zimna płyta</button>
       </div>
 
       <div class="search">
@@ -118,7 +93,7 @@
 
     <section id="katalog" class="catalog">
       <div class="catalog__head">
-        <h2>Katalog</h2>
+        <h2>Menu</h2>
         <p class="muted">Rozwiń kategorię i dodaj pozycje do zamówienia.</p>
       </div>
 
@@ -136,6 +111,21 @@
         <details open>
           <summary>Wege <span class="accCount" id="countVege">(0)</span></summary>
           <div class="grid" id="gridVege"></div>
+        </details>
+
+        <details open>
+          <summary>Na słodko <span class="accCount" id="countSweet">(0)</span></summary>
+          <div class="grid" id="gridSweet"></div>
+        </details>
+
+        <details open>
+          <summary>Sałatki <span class="accCount" id="countSalad">(0)</span></summary>
+          <div class="grid" id="gridSalad"></div>
+        </details>
+
+        <details open>
+          <summary>Zimna płyta <span class="accCount" id="countPlyta">(0)</span></summary>
+          <div class="grid" id="gridPlyta"></div>
         </details>
       </div>
     </section>
@@ -202,12 +192,16 @@
 
       <label class="field">
         <span>Godzina</span>
-        <input id="time" type="time" required />
+        <div class="timeRow">
+          <select id="timeHour"><option value="">--</option></select>
+          <span class="timeSep">:</span>
+          <select id="timeMin"><option value="">--</option></select>
+        </div>
       </label>
 
       <label class="field field--full">
         <span>Odbiór / dowóz + adres</span>
-        <input id="where" placeholder="np. ul. X 12/3, Żory" required />
+        <input id="where" placeholder="np. ul. X 12/3, Żory \ Odbiór" required />
       </label>
 
       <label class="field field--full">
@@ -233,6 +227,8 @@
       <p class="muted tiny">To jest tylko wysłanie wiadomości przez WhatsApp — nie oznacza automatycznego potwierdzenia zamówienia.</p>
     </div>
   </aside>
+
+  <button class="toTop" id="toTop" aria-label="Wróć na górę">↑</button>
 
   <footer class="footer">
     <div class="container footer__inner">
