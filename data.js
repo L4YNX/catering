@@ -557,7 +557,7 @@ const PRODUCTS = [
   },
   {
     id: 36,
-    name: "Paterky Wieprz",
+    name: "Paterkowy Wieprz",
     tags: ["hot"],
     serves: "15-20",
     price: 400,

@@ -80,7 +80,7 @@ function cardHTML(p){
     <article class="card">
       <div class="thumb thumb--photo" ${bg}>
         <span class="pTag">${typeLabel}</span>
-        <span class="pTag">dla ${p.serves}</span>
+        ${p.serves ? `<span class="pTag">dla ${p.serves}</span>` : ""}
       </div>
 
       <div class="cardBody">
