@@ -418,6 +418,40 @@ q?.addEventListener("input", render);
 function openPanel(){ panel?.classList.add("is-open"); panel?.setAttribute("aria-hidden","false"); }
 function closePanel(){ panel?.classList.remove("is-open"); panel?.setAttribute("aria-hidden","true"); }
 
+// ====== HAMBURGER NAV (mobile) ======
+const topBar = document.querySelector(".top");
+const navToggle = $("navToggle");
+const navEl = $("nav");
+
+function setNav(open){
+  if(!topBar) return;
+  topBar.classList.toggle("nav-open", open);
+  navToggle?.setAttribute("aria-expanded", open ? "true" : "false");
+  navToggle?.setAttribute("aria-label", open ? "Zamknij menu" : "Otwórz menu");
+}
+
+navToggle?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  setNav(!topBar?.classList.contains("nav-open"));
+});
+
+// zamknij po kliknięciu w link w menu
+navEl?.addEventListener("click", (e) => {
+  if(e.target.closest("a")) setNav(false);
+});
+
+// zamknij klikając poza menu
+document.addEventListener("click", (e) => {
+  if(!topBar?.classList.contains("nav-open")) return;
+  if(e.target.closest("#nav") || e.target.closest("#navToggle")) return;
+  setNav(false);
+});
+
+// zamknij klawiszem Esc
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape") setNav(false);
+});
+
 $("openPanel")?.addEventListener("click", openPanel);
 $("openPanel2")?.addEventListener("click", openPanel);
 $("closePanel")?.addEventListener("click", closePanel);

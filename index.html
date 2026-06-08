@@ -45,15 +45,26 @@
     <div class="container top__inner">
       <a class="brand" href="#top"><img class="logo" src="assets/logo.png" alt="Logo Paterki"></a>
 
-      <nav class="nav">
+      <nav class="nav" id="nav">
         <a href="#katalog">Menu</a>
         <a href="#jak">Jak zamówić</a>
         <a href="#faq">FAQ</a>
         <a class="btn btn--small" style="color: white;" href="tel:+48508014420">Zadzwoń</a>
       </nav>
 
+      <button class="navToggle" id="navToggle" aria-label="Otwórz menu" aria-expanded="false" aria-controls="nav">
+        <span class="navToggle__bars"></span>
+      </button>
+
       <button class="orderBtn" id="openPanel" aria-label="Podgląd zamówienia">
-        Zamówienie <span id="count">0</span>
+        <svg class="orderBtn__icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span class="orderBtn__label">Zamówienie</span>
+        <span id="count">0</span>
       </button>
     </div>
   </header>

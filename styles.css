@@ -113,6 +113,61 @@ a {
   color: var(--text)
 }
 
+/* Hamburger (domyślnie ukryty — tylko mobile) */
+.navToggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 12px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(16, 24, 40, .06);
+}
+
+.navToggle__bars,
+.navToggle__bars::before,
+.navToggle__bars::after {
+  content: "";
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: transform .2s ease, opacity .2s ease, background .2s ease;
+}
+
+.navToggle__bars {
+  position: relative;
+}
+
+.navToggle__bars::before {
+  position: absolute;
+  left: 0;
+  top: -6px;
+}
+
+.navToggle__bars::after {
+  position: absolute;
+  left: 0;
+  top: 6px;
+}
+
+/* Animacja w "X" gdy menu otwarte */
+.top.nav-open .navToggle__bars {
+  background: transparent;
+}
+
+.top.nav-open .navToggle__bars::before {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.top.nav-open .navToggle__bars::after {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -170,7 +225,7 @@ a {
   box-shadow: 0 6px 18px rgba(16, 24, 40, .06);
 }
 
-.orderBtn span {
+.orderBtn span#count {
   min-width: 26px;
   height: 22px;
   border-radius: 999px;
@@ -180,6 +235,19 @@ a {
   color: var(--brand);
   border: 1px solid rgba(46, 144, 250, .25);
   font-weight: 900;
+}
+
+/* Ikona koszyka — widoczna zawsze */
+.orderBtn__icon {
+  display: block;
+  color: var(--brand);
+}
+
+/* Na małych ekranach zostaje sam koszyk + licznik */
+@media (max-width: 520px) {
+  .orderBtn__label {
+    display: none;
+  }
 }
 
 .hero {
@@ -1022,8 +1090,47 @@ details p {
 }
 
 @media (max-width: 900px) {
+  .navToggle {
+    display: inline-flex;
+    margin-left: auto;
+  }
+
   .nav {
-    display: none
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-left: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: .15rem;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 14px 26px rgba(16, 24, 40, .10);
+    padding: .4rem 1rem 1rem;
+    /* ukryte, ale animowane */
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+
+  .top.nav-open .nav {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .nav a {
+    color: var(--text);
+    font-weight: 700;
+    padding: .9rem .4rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav a:last-child {
+    border-bottom: none;
+    margin-top: .5rem;
   }
 
   .hero {
