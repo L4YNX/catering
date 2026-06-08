@@ -462,6 +462,9 @@ function boot(){
 
   fillTimeOptions();
   renderPopular();
+
+  const fbLink = $("fbPageLink");
+  if(fbLink) fbLink.href = SITE_CONFIG.facebookUrl;
   updateUI();
   validateDate();
   validateForm();
