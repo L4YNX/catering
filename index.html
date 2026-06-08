@@ -239,10 +239,15 @@
         </div>
       </label>
 
-      <label class="field field--full">
-        <span>Odbiór / dowóz + adres</span>
-        <input id="where" placeholder="np. ul. X 12/3, Żory \ Odbiór" required />
-      </label>
+      <div class="field field--full">
+        <span>Odbiór / dowóz</span>
+        <div class="modeToggle" id="modeToggle" role="group" aria-label="Sposób odbioru">
+          <button type="button" class="modeBtn" data-mode="odbior" aria-pressed="false">Odbiór</button>
+          <button type="button" class="modeBtn" data-mode="dowoz" aria-pressed="false">Dowóz</button>
+        </div>
+        <input id="where" class="addrInput" placeholder="np. ul. X 12/3, Żory" autocomplete="street-address" hidden />
+        <div class="modeHint" id="modeHint"></div>
+      </div>
 
       <label class="field field--full">
         <span>Uwagi / alergie</span>

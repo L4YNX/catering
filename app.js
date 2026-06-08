@@ -329,8 +329,10 @@ function buildText(){
     lines.push(`Termin: ${date || "bez daty"}${time ? " " + time : ""}`);
   }
 
-  if(where){
-    lines.push(`${where}`);
+  if(deliveryMode === "odbior"){
+    lines.push("Odbiór osobisty");
+  } else if(deliveryMode === "dowoz"){
+    lines.push(`Dowóz: ${where || "(brak adresu)"}`);
   }
 
   if(notes){
@@ -480,14 +482,47 @@ $("clear")?.addEventListener("click", () => {
   updateUI();
 });
 
-// Formularz jest wymagany — bez daty, godziny i adresu nie można skopiować ani wysłać zamówienia.
+// ====== ODBIÓR / DOWÓZ ======
+const modeBtns = $$("#modeToggle .modeBtn");
+const modeHint = $("modeHint");
+let deliveryMode = null; // "odbior" | "dowoz"
+
+function setDeliveryMode(mode){
+  deliveryMode = mode;
+  const isDowoz = mode === "dowoz";
+
+  modeBtns.forEach(b => {
+    const on = b.dataset.mode === mode;
+    b.classList.toggle("is-active", on);
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+
+  if(whereEl){
+    whereEl.hidden = !isDowoz;
+    if(!isDowoz) whereEl.value = "";
+    else whereEl.focus();
+  }
+  if(modeHint){
+    modeHint.textContent = isDowoz ? "Podaj adres dowozu." : "Odbiór osobisty — adres nie jest potrzebny.";
+  }
+
+  validateForm();
+}
+
+modeBtns.forEach(b => b.addEventListener("click", () => setDeliveryMode(b.dataset.mode)));
+
+// Formularz jest wymagany — bez daty, godziny i sposobu odbioru nie można wysłać zamówienia.
+// Adres wymagany tylko przy dowozie.
 function validateForm(){
   const hasProducts = cart.size > 0;
   const hasDate = (dateEl?.value || "").trim().length > 0;
   const hasTime = (timeHourEl?.value || "").length > 0 && (timeMinEl?.value || "").length > 0;
-  const hasWhere = (whereEl?.value || "").trim().length >= 5;
+  const hasMode = deliveryMode === "odbior" || deliveryMode === "dowoz";
+  const addrOk = deliveryMode === "odbior"
+    ? true
+    : (whereEl?.value || "").trim().length >= 5;
   const dateOk = validateDate();
-  const canSend = hasProducts && hasDate && hasTime && hasWhere && dateOk;
+  const canSend = hasProducts && hasDate && hasTime && hasMode && addrOk && dateOk;
 
   [waBtn, copyBtn].forEach(btn => {
     if(!btn) return;

@@ -776,6 +776,50 @@ details p {
   appearance: none;
 }
 
+.modeToggle {
+  display: flex;
+  gap: .5rem;
+}
+
+.modeBtn {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text);
+  padding: .75rem .9rem;
+  border-radius: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(16, 24, 40, .04);
+  transition: background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+.modeBtn:hover {
+  border-color: var(--brand);
+  transform: translateY(-1px);
+}
+
+.modeBtn.is-active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+.addrInput {
+  margin-top: .6rem;
+}
+
+.addrInput[hidden] {
+  display: none;
+}
+
+.modeHint {
+  margin-top: .4rem;
+  font-size: .82rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .timeRow {
   display: flex;
   align-items: center;
