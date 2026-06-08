@@ -627,7 +627,7 @@ const PRODUCTS = [
 
   {
     id: 41,
-    name: "Sałatki domowej roboty 1000ml",
+    name: "Sałatki domowej roboty 1l",
     tags: ["salad"],
     serves: "",
     price: 50,
