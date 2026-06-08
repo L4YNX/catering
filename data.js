@@ -442,7 +442,7 @@ const PRODUCTS = [
   },
   {
     id: 28,
-    name: "koryto Głodomorów",
+    name: "Koryto Głodomorów",
     tags: ["hot"],
     serves: "8-10",
     price: 300,
@@ -460,144 +460,194 @@ const PRODUCTS = [
   },
   {
     id: 29,
-    name: "Patera nr. 29",
+    name: "Koryto Chłopskie",
     tags: ["hot"],
-    serves: "4–6",
-    price: 99,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    serves: "8-10",
+    price: 360,
+    note: "3x golonko pieczone<br>\
+    3x golonko gotowane<br>\
+    12x zawijaniec drobiowy w boczku pieczony w sosie BBQ<br>\
+    6x pieczarka nadziewana<br>\
+    500ml kapusta zasmażana",
+    img: "assets/koryta/chlopskie.jpg",
     available: true,
     popular: false,
   },
   {
     id: 30,
-    name: "Patera nr. 30",
+    name: "Koryto Mięsna Uczta Szefa",
     tags: ["hot"],
-    serves: "6–8",
-    price: 119,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    serves: "8-12",
+    price: 380,
+    note: "2x schab z kością<br>\
+    2x drobiowy panierowany<br>\
+    4x nuggetsy drobiowe<br>\
+    4x rolsy ze schaby z zurawiną<br>\
+    2x donut wytrawny w marynacie musztardowo-miodowej<br>\
+    4x wieprz na patyku w marynacie Ballantines<br>\
+    2x schab pod pierzynką<br>\
+    2x warkocz wieprzowy w marynacie meksykańskiej<br>\
+    2x jabłko faszerowane krupniokiem",
+    img: "assets/koryta/miesna_uczta.jpg",
     available: true,
     popular: false,
   },
   {
     id: 31,
-    name: "Patera nr. 31",
+    name: "Koryto Latające Skrzydło",
     tags: ["hot"],
-    serves: "4–6",
-    price: 99,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    serves: "6-10",
+    price: 150,
+    note: "20x skrzydełka w marynacie słodko-pikantnej<br>\
+    1kg frytki zakręcone",
+    img: "assets/koryta/skrzydelka.jpg",
     available: true,
     popular: false,
   },
   {
     id: 32,
-    name: "Patera nr. 32",
+    name: "Koryto Słodka Ptaszyna",
     tags: ["hot"],
-    serves: "6–8",
-    price: 119,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    serves: "4–6",
+    price: 130,
+    note: "4x pierw zurawinie z serem feta i orzechami<br>\
+    200g ryz gotowany",
+    img: "assets/koryta/slodka_ptaszyna.jpg",
     available: true,
     popular: false,
   },
   {
     id: 33,
-    name: "Patera nr. 33",
+    name: "Koryto Śląska Uczta",
     tags: ["hot"],
-    serves: "4–6",
-    price: 99,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    serves: "6-8",
+    price: 200,
+    note: "800g polędwiczki wieprzowe w sosie z leśnych grzybów<br>\
+    40x kluski śląskie",
+    img: "assets/koryta/slaska_uczta.jpg",
     available: true,
     popular: false,
   },
   {
     id: 34,
-    name: "Patera nr. 34",
+    name: "Wegetariańskie",
     tags: ["hot"],
-    serves: "6–8",
-    price: 119,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    serves: "2",
+    price: 85,
+    note: "1x papryka faszerowana<br>\
+    8x pieczarka faszerowana<br>\
+    1x camembert panierowany",
+    img: "assets/koryta/wege.jpg",
     available: true,
     popular: false,
   },
   {
     id: 35,
-    name: "Patera nr. 35",
+    name: "Paterkowa Świnka",
     tags: ["hot"],
-    serves: "4–6",
-    price: 99,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    serves: "6-8",
+    price: 170,
+    note: "1kg pieczona soczysta szynka wieprzowa w kształcie swinki<br>\
+    0,8kg opiekane ziemniaki<br>\
+    porcja chrzanu<br>\
+    porcja musztardy",
+    img: "assets/koryta/paterkowa_swinka.jpg",
     available: true,
     popular: false,
   },
   {
     id: 36,
-    name: "Patera nr. 36",
+    name: "Paterky Wieprz",
     tags: ["hot"],
-    serves: "6–8",
-    price: 119,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    serves: "15-20",
+    price: 400,
+    note: "3kg pieczona soczysta szynka wieprzowa w kształcie swinki<br>\
+    1,6 kg opiekane ziemniaki<br>\
+    porcja chrzanu<br>\
+    porcja musztardy",
+    img: "assets/koryta/paterkowa_swinka.jpg",
     available: true,
     popular: false,
   },
   {
     id: 37,
-    name: "Patera nr. 37",
+    name: "Drobiowy Półmisek",
     tags: ["hot"],
-    serves: "4–6",
-    price: 99,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    serves: "4-8",
+    price: 110,
+    note: "4x kotlet panierowany<br>\
+    4x grillowane kotleciki<br>\
+    8x nuggetsy",
+    img: "assets/koryta/drobiowy_polmisek.jpg",
     available: true,
     popular: false,
   },
   {
     id: 38,
-    name: "Patera nr. 38",
+    name: "Drobiowy Półmisek z kulkami",
     tags: ["hot"],
-    serves: "6–8",
-    price: 119,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    serves: "4-8",
+    price: 130,
+    note: "4x kotlet panierowany<br>\
+    4x grillowane kotleciki<br>\
+    8x nuggetsy<br>\
+    500g kulki opiekane",
+    img: "assets/koryta/drobiowy_kuilki.jpg",
     available: true,
     popular: false,
   },
   {
     id: 39,
-    name: "Patera nr. 39",
+    name: "Pierogi domowej roboty",
     tags: ["hot"],
-    serves: "4–6",
-    price: 99,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    serves: "",
+    price: 3,
+    note: "Sprzedawane na sztuki, różne rodzaje do wyboru<br>\
+    ruskie<br>\
+    z mięsem<br>\
+    z kapustą i grzybami",
+    img: "assets/koryta/pierogi.jpg",
     available: true,
     popular: false,
   },
   {
     id: 40,
-    name: "Patera nr. 40",
-    tags: ["hot"],
-    serves: "6–8",
-    price: 119,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    name: "Sałatki domowej roboty 500ml",
+    tags: ["salad"],
+    serves: "",
+    price: 25,
+    note: "musztardowy miód<br>\
+    grecka<br>\
+    gyros<br>\
+    kapusta zasmażana na cieplo z boczkiem",
+    img: "assets/salatki/salatki.jpg",
     available: true,
     popular: false,
   },
+
   {
     id: 41,
-    name: "Patera nr. 41",
-    tags: ["hot"],
-    serves: "4–6",
-    price: 99,
-    note: "Klasyczna, dla każdego.",
-    img: "",
+    name: "Sałatki domowej roboty 1000ml",
+    tags: ["salad"],
+    serves: "",
+    price: 50,
+    note: "musztardowy miód<br>\
+    grecka<br>\
+    gyros<br>\
+    kapusta zasmażana na cieplo z boczkiem",
+    img: "assets/salatki/salatki.jpg",
+    available: true,
+    popular: false,
+  },
+
+  {
+    id: 42,
+    name: "Smalec 200ml",
+    tags: ["plyta"],
+    serves: "",
+    price: 15,
+    note: "z boczkiem cebulka i jabłkiem wypalany na ogniu",
+    img: "assets/salatki/smalec.jpg",
     available: true,
     popular: false,
   },
