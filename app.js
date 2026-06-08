@@ -349,19 +349,26 @@ timeHourEl?.addEventListener("change", validateForm);
 timeMinEl?.addEventListener("change", validateForm);
 
 // ===== FB/IG GALLERY (from our API) =====
+// Ustaw prawdziwy URL backendu gdy będzie gotowy, np. "https://twoj-worker.workers.dev/posts"
+const FB_API_URL = "";
+
 async function loadFB(){
+  const gallery = document.querySelector(".fbGallery");
   const grid = document.getElementById("fbGrid");
-  const pageLink = document.getElementById("fbPageLink");
   if(!grid) return;
 
-  try{
-    // TU będzie URL do Twojego backendu (Cloudflare Worker)
-    const API_URL = "https://www.facebook.com/justyna.obara?locale=pl_PL";
+  // Brak API — ukryj sekcję galerii żeby nie spowalniać strony
+  if(!FB_API_URL){
+    if(gallery) gallery.style.display = "none";
+    return;
+  }
 
-    const res = await fetch(API_URL, { cache: "no-store" });
+  try{
+    const res = await fetch(FB_API_URL, { cache: "no-store" });
     if(!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
 
+    const pageLink = document.getElementById("fbPageLink");
     if(pageLink && data.page_url) pageLink.href = data.page_url;
 
     const posts = (data.posts || []).slice(0, 6);
@@ -381,8 +388,8 @@ async function loadFB(){
     `).join("");
 
   }catch(err){
-    grid.innerHTML = `<div class="muted">Nie udało się załadować galerii.</div>`;
-    console.warn(err);
+    if(gallery) gallery.style.display = "none";
+    console.warn("Galeria niedostępna:", err);
   }
 }
 
