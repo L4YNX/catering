@@ -357,9 +357,9 @@ async function loadFB(){
   const grid = document.getElementById("fbGrid");
   if(!grid) return;
 
-  // Brak API — ukryj sekcję galerii żeby nie spowalniać strony
+  // Brak API — zostaw sekcję widoczną, pokaż placeholder
   if(!FB_API_URL){
-    if(gallery) gallery.style.display = "none";
+    if(grid) grid.innerHTML = `<div class="muted">Galeria wkrótce.</div>`;
     return;
   }
 
