@@ -885,7 +885,30 @@ details p {
 
 @media (max-width: 520px) {
   .fbGrid {
-    grid-template-columns: 1fr;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: .75rem;
+    padding-bottom: .5rem;
+    scrollbar-width: none;
+  }
+
+  .fbGrid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .fbGrid .fbCard {
+    flex: 0 0 78vw;
+    scroll-snap-align: start;
+  }
+
+  .fbGrid .fbCard--hidden {
+    display: flex !important;
+  }
+
+  .fbToggle {
+    display: none;
   }
 
   .fbImg {
