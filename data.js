@@ -135,7 +135,7 @@ const PRODUCTS = [
     4x francuskie parówki<br>",
     img: "assets/patery/patera7.jpg",
     available: true,
-    popular: false,
+    popular: true,
   },
   {
     id: 8,
@@ -195,7 +195,7 @@ const PRODUCTS = [
     4x francuskie parówki",
     img: "assets/patery/patera10.jpg",
     available: true,
-    popular: false,
+    popular: true,
   },
   {
     id: 11,
@@ -367,7 +367,7 @@ const PRODUCTS = [
     ser w plastrach",
     img: "assets/patery/patera23.jpg",
     available: true,
-    popular: false,
+    popular: true,
   },
   {
     id: 24,
@@ -387,7 +387,7 @@ const PRODUCTS = [
     2x 200ml sałatka musztardowy miód",
     img: "assets/patery/patera24.jpg",
     available: true,
-    popular: false,
+    popular: true,
   },
   {
     id: 25,
@@ -405,7 +405,7 @@ const PRODUCTS = [
     3x francuzy z szynką i porem",
     img: "assets/patery/patera25.jpg",
     available: true,
-    popular: false,
+    popular: true,
   },
     {
     id: 26,
@@ -553,7 +553,7 @@ const PRODUCTS = [
     porcja musztardy",
     img: "assets/koryta/paterkowa_swinka.jpg",
     available: true,
-    popular: false,
+    popular: true,
   },
   {
     id: 36,
@@ -567,7 +567,7 @@ const PRODUCTS = [
     porcja musztardy",
     img: "assets/koryta/paterkowa_swinka.jpg",
     available: true,
-    popular: false,
+    popular: true,
   },
   {
     id: 37,
@@ -602,42 +602,36 @@ const PRODUCTS = [
     tags: ["hot"],
     serves: "",
     price: 3,
-    note: "Sprzedawane na sztuki, różne rodzaje do wyboru<br>\
-    ruskie<br>\
-    z mięsem<br>\
-    z kapustą i grzybami",
+    note: "Cena za sztukę. Wybierz rodzaj i wpisz ilość.",
     img: "assets/koryta/pierogi.jpg",
     available: true,
     popular: false,
+    flavors: [
+      "ruskie",
+      "z mięsem",
+      "z kapustą i grzybami",
+    ],
+    qtyInput: true,
   },
   {
     id: 40,
-    name: "Sałatki domowej roboty 500ml",
+    name: "Sałatki domowej roboty",
     tags: ["salad"],
     serves: "",
-    price: 25,
-    note: "musztardowy miód<br>\
-    grecka<br>\
-    gyros<br>\
-    kapusta zasmażana na cieplo z boczkiem",
+    note: "Wybierz smak i rozmiar poniżej.",
     img: "assets/salatki/salatki.jpg",
     available: true,
     popular: false,
-  },
-
-  {
-    id: 41,
-    name: "Sałatki domowej roboty 1l",
-    tags: ["salad"],
-    serves: "",
-    price: 50,
-    note: "musztardowy miód<br>\
-    grecka<br>\
-    gyros<br>\
-    kapusta zasmażana na cieplo z boczkiem",
-    img: "assets/salatki/salatki.jpg",
-    available: true,
-    popular: false,
+    flavors: [
+      "musztardowy miód",
+      "grecka",
+      "gyros",
+      "kapusta zasmażana na ciepło z boczkiem",
+    ],
+    sizes: [
+      { label: "500 ml", price: 25 },
+      { label: "1000 ml", price: 50 },
+    ],
   },
 
   {

@@ -54,13 +54,43 @@ const whereEl = $("where");
 
 // ====== STATE ======
 let active = "all";
-let cart = new Map(); // id -> qty
+let cart = new Map(); // key -> qty  (key: "id" lub "id:rozmiar")
+
+function cartKey(id, sizeLabel, flavor){
+  // klucz: "id|rozmiar|smak" (puste pola dozwolone)
+  return [id, sizeLabel || "", flavor || ""].join("|");
+}
+
+function resolveCartItem(key){
+  let id, sizeLabel = null, flavor = null;
+  if(key.includes("|")){
+    const parts = key.split("|");
+    id = Number(parts[0]);
+    sizeLabel = parts[1] || null;
+    flavor = parts[2] || null;
+  } else {
+    // zgodność wstecz ze starym formatem "id:rozmiar"
+    const colonIdx = key.indexOf(":");
+    id = Number(colonIdx >= 0 ? key.slice(0, colonIdx) : key);
+    sizeLabel = colonIdx >= 0 ? key.slice(colonIdx + 1) : null;
+  }
+  const p = PRODUCTS.find(x => x.id === id);
+  if(!p) return null;
+
+  let price = p.price, serves = p.serves || "";
+  if(sizeLabel && p.sizes){
+    const sz = p.sizes.find(s => s.label === sizeLabel);
+    price = sz?.price ?? 0;
+    serves = sz?.serves ?? "";
+  }
+  return { p, sizeLabel, flavor, price, serves };
+}
 
 function total(){
   let sum = 0;
-  for (const [id, qty] of cart.entries()){
-    const p = PRODUCTS.find(x => x.id === id);
-    if (p) sum += p.price * qty;
+  for(const [key, qty] of cart.entries()){
+    const item = resolveCartItem(key);
+    if(item) sum += item.price * qty;
   }
   return sum;
 }
@@ -69,31 +99,81 @@ function total(){
 function cardHTML(p){
   const typeLabel = TAG_LABELS[p.tags[0]] || p.tags[0];
   const bg = p.img ? `style="background-image:url('${p.img}');"` : "";
+  const pills = p.tags.map(t => TAG_LABELS[t]).filter(Boolean).map(lbl => `<span class="pill">${lbl}</span>`).join("");
 
-  const pills = p.tags
-    .map(t => TAG_LABELS[t])
-    .filter(Boolean)
-    .map(lbl => `<span class="pill">${lbl}</span>`)
-    .join("");
+  // Produkt konfigurowalny: wybór smaku/rozmiaru i/lub własny wpis
+  const hasSizes   = p.sizes   && p.sizes.length   > 0;
+  const hasFlavors = p.flavors && p.flavors.length > 0;
+  const hasQty     = !!p.qtyInput;
+  if(hasSizes || hasFlavors || hasQty){
+    const startPrice = hasSizes ? p.sizes[0].price : p.price;
 
+    const sizeOptions = hasSizes ? p.sizes.map(s =>
+      `<option value="${s.label}" data-price="${s.price}">${s.label} — ${money(s.price)}</option>`
+    ).join("") : "";
+
+    const flavorOptions = hasFlavors ? p.flavors.map(f =>
+      `<option value="${f}">${f}</option>`
+    ).join("") : "";
+
+    const flavorSelect = hasFlavors
+      ? `<label class="optField"><span class="optLabel">Smak</span>
+           <select class="flavorSelect" data-product-id="${p.id}">${flavorOptions}</select></label>`
+      : "";
+
+    const sizeSelect = hasSizes
+      ? `<label class="optField"><span class="optLabel">Rozmiar</span>
+           <select class="sizeSelect" data-product-id="${p.id}">${sizeOptions}</select></label>`
+      : "";
+
+    const qtyField = hasQty
+      ? `<label class="optField optField--qty"><span class="optLabel">Ilość (szt.)</span>
+           <input type="number" class="qtyInput" data-product-id="${p.id}"
+                  value="1" min="1" step="1" inputmode="numeric"></label>`
+      : "";
+
+    return `
+      <article class="card" data-card-id="${p.id}">
+        <div class="thumb thumb--photo" ${bg}>
+          <span class="pTag">${typeLabel}</span>
+        </div>
+        <div class="cardBody">
+          <div class="titleRow">
+            <strong>${p.name}</strong>
+            <span class="price2 sizePrice">${money(startPrice)}</span>
+          </div>
+          <div class="sub">${p.note}</div>
+          ${pills ? `<div class="metaRow">${pills}</div>` : ""}
+          <div class="optRow">
+            ${flavorSelect}
+            ${sizeSelect}
+            ${qtyField}
+          </div>
+          <div class="buyRow">
+            <span></span>
+            <button class="add" data-add="${p.id}" data-sized="1">Dodaj</button>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  // Zwykły produkt
   return `
-    <article class="card">
+    <article class="card" data-card-id="${p.id}">
       <div class="thumb thumb--photo" ${bg}>
         <span class="pTag">${typeLabel}</span>
         ${p.serves ? `<span class="pTag">dla ${p.serves}</span>` : ""}
       </div>
-
       <div class="cardBody">
         <div class="titleRow">
           <strong>${p.name}</strong>
           <span class="price2">${money(p.price)}</span>
         </div>
         <div class="sub">${p.note}</div>
-
         ${pills ? `<div class="metaRow">${pills}</div>` : ""}
-
         <div class="buyRow">
-          <span class="muted"></strong></span>
+          <span></span>
           <button class="add" data-add="${p.id}">Dodaj</button>
         </div>
       </div>
@@ -173,19 +253,23 @@ function updateUI(){
     return;
   }
 
-  items.innerHTML = Array.from(cart.entries()).map(([id, qty]) => {
-    const p = PRODUCTS.find(x => x.id === id);
-    if(!p) return "";
+  items.innerHTML = Array.from(cart.entries()).map(([key, qty]) => {
+    const item = resolveCartItem(key);
+    if(!item) return "";
+    const { p, sizeLabel, flavor, price, serves } = item;
+    const opts = [flavor, sizeLabel].filter(Boolean).join(", ");
+    const name = opts ? `${p.name} <span class="muted">(${opts})</span>` : p.name;
+    const servesText = serves ? ` • dla ${serves}` : "";
     return `
       <div class="lineItem">
         <div>
-          <strong>${p.name}</strong>
-          <div class="muted tiny">${money(p.price)} / szt. • dla ${p.serves}</div>
+          <strong>${name}</strong>
+          <div class="muted tiny">${money(price)} / szt.${servesText}</div>
         </div>
         <div class="qty">
-          <button data-dec="${id}">−</button>
+          <button data-dec="${key}">−</button>
           <span>${qty}</span>
-          <button data-inc="${id}">+</button>
+          <button data-inc="${key}">+</button>
         </div>
       </div>
     `;
@@ -229,10 +313,13 @@ function buildText(){
   const lines = ["Zamówienie – patery:", ""];
   if(cart.size === 0) lines.push("(brak produktów)");
 
-  for(const [id, qty] of cart.entries()){
-    const p = PRODUCTS.find(x => x.id === id);
-    if(!p) continue;
-    lines.push(`- ${p.name} x${qty} (${money(p.price)}/szt.)`);
+  for(const [key, qty] of cart.entries()){
+    const item = resolveCartItem(key);
+    if(!item) continue;
+    const { p, sizeLabel, flavor, price } = item;
+    const opts = [flavor, sizeLabel].filter(Boolean).join(", ");
+    const name = opts ? `${p.name} (${opts})` : p.name;
+    lines.push(`- ${name} x${qty} (${money(price)}/szt.)`);
   }
 
   lines.push("");
@@ -255,6 +342,13 @@ function buildText(){
 
 // ====== EVENTS (SAFE) ======
 document.addEventListener("click", (e) => {
+  // klik w pozycję z "Najpopularniejsze" -> przejdź do niej w menu
+  const gotoEl = e.target.closest?.("[data-goto]");
+  if(gotoEl){
+    gotoProduct(Number(gotoEl.getAttribute("data-goto")));
+    return;
+  }
+
   if(e.target.classList.contains("sub")){
     e.target.classList.toggle("is-expanded");
     return;
@@ -263,27 +357,52 @@ document.addEventListener("click", (e) => {
   const add = e.target?.getAttribute?.("data-add");
   if(add){
     const id = Number(add);
-    cart.set(id, (cart.get(id) || 0) + 1);
+    const isSized = e.target.getAttribute("data-sized");
+    let key;
+    let addQty = 1;
+    if(isSized){
+      const card = e.target.closest(".card");
+      const sel = card?.querySelector(".sizeSelect");
+      const flav = card?.querySelector(".flavorSelect");
+      const qtyEl = card?.querySelector(".qtyInput");
+      key = cartKey(id, sel?.value || "", flav?.value || "");
+      if(qtyEl){
+        const n = parseInt(qtyEl.value, 10);
+        addQty = (Number.isFinite(n) && n > 0) ? n : 1;
+        qtyEl.value = "1"; // reset do domyślnej ilości
+      }
+    } else {
+      key = cartKey(id, null, null);
+    }
+    cart.set(key, (cart.get(key) || 0) + addQty);
     updateUI();
     return;
   }
 
   const inc = e.target?.getAttribute?.("data-inc");
   if(inc){
-    const id = Number(inc);
-    cart.set(id, (cart.get(id)||0) + 1);
+    cart.set(inc, (cart.get(inc)||0) + 1);
     updateUI();
     return;
   }
 
   const dec = e.target?.getAttribute?.("data-dec");
   if(dec){
-    const id = Number(dec);
-    const next = (cart.get(id)||0) - 1;
-    if(next <= 0) cart.delete(id);
-    else cart.set(id, next);
+    const next = (cart.get(dec)||0) - 1;
+    if(next <= 0) cart.delete(dec);
+    else cart.set(dec, next);
     updateUI();
     return;
+  }
+});
+
+// Zmiana rozmiaru na karcie — aktualizuje wyświetlaną cenę
+document.addEventListener("change", (e) => {
+  if(e.target.classList.contains("sizeSelect")){
+    const card = e.target.closest(".card");
+    const opt = e.target.options[e.target.selectedIndex];
+    const priceEl = card?.querySelector(".sizePrice");
+    if(priceEl && opt.dataset.price) priceEl.textContent = money(Number(opt.dataset.price));
   }
 });
 
@@ -476,7 +595,8 @@ function renderPopular(){
   list.innerHTML = popular.map(p => {
     const labels = p.tags.map(t => TAG_LABELS[t]).filter(Boolean).join(" • ");
     return `
-      <div class="miniItem">
+      <div class="miniItem" data-goto="${p.id}" role="button" tabindex="0"
+           title="Pokaż w menu" aria-label="${p.name} — pokaż w menu">
         <div class="dot"></div>
         <div>
           <strong>${p.name}</strong>
@@ -487,6 +607,33 @@ function renderPopular(){
     `;
   }).join("");
 }
+
+// ====== PRZEJŚCIE DO POZYCJI W MENU ======
+function gotoProduct(id){
+  // wyczyść szukajkę i pokaż wszystkie kategorie, by pozycja była widoczna
+  if(q) q.value = "";
+  setFilter("all"); // renderuje katalog i otwiera sekcje
+
+  requestAnimationFrame(() => {
+    const card = document.querySelector(`.card[data-card-id="${id}"]`);
+    if(!card) return;
+    const det = card.closest("details");
+    if(det) det.open = true;
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    card.classList.add("card--flash");
+    setTimeout(() => card.classList.remove("card--flash"), 1800);
+  });
+}
+
+// obsługa klawiatury (Enter/Spacja) na klikalnych pozycjach popularnych
+document.addEventListener("keydown", (e) => {
+  if(e.key !== "Enter" && e.key !== " ") return;
+  const gotoEl = e.target.closest?.("[data-goto]");
+  if(gotoEl){
+    e.preventDefault();
+    gotoProduct(Number(gotoEl.getAttribute("data-goto")));
+  }
+});
 
 // ====== SCROLL TO TOP ======
 const toTopBtn = $("toTop");
