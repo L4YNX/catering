@@ -843,6 +843,27 @@ details p {
   font-weight: 700;
 }
 
+.fbCard--hidden {
+  display: none !important;
+}
+
+.fbToggle {
+  display: block;
+  margin: .85rem auto 0;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--brand);
+  font-weight: 800;
+  padding: .6rem 1.4rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+
+.fbToggle:hover {
+  background: var(--soft);
+}
+
 .hero.hero--wide {
   grid-template-columns: 1fr;
 }

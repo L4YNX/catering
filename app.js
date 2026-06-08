@@ -348,6 +348,44 @@ dateEl?.addEventListener("input", validateForm);
 timeHourEl?.addEventListener("change", validateForm);
 timeMinEl?.addEventListener("change", validateForm);
 
+// ===== GALLERY RENDER =====
+function renderGallery(grid, posts){
+  const SHOW = 3;
+  grid.innerHTML = posts.map(p => `
+    <a class="fbCard" href="${p.url || p.permalink_url}" target="_blank" rel="noopener">
+      <div class="fbImg" style="background-image:url('${p.img || p.image || ""}')"></div>
+      <div class="fbBody">
+        <div class="fbText">${escapeHTML(p.text || p.message || "")}</div>
+        <div class="fbMeta">${new Date(p.date || p.created_time).toLocaleDateString("pl-PL")}</div>
+      </div>
+    </a>
+  `).join("");
+
+  if(posts.length <= SHOW) return;
+
+  // ukryj zdjęcia po 3
+  Array.from(grid.children).slice(SHOW).forEach(el => el.classList.add("fbCard--hidden"));
+
+  // przycisk
+  const btn = document.createElement("button");
+  btn.className = "fbToggle";
+  btn.textContent = `Pokaż więcej (${posts.length - SHOW})`;
+  grid.after(btn);
+
+  btn.addEventListener("click", () => {
+    const hidden = grid.querySelectorAll(".fbCard--hidden");
+    const isExpanded = hidden.length === 0;
+
+    if(isExpanded){
+      Array.from(grid.children).slice(SHOW).forEach(el => el.classList.add("fbCard--hidden"));
+      btn.textContent = `Pokaż więcej (${posts.length - SHOW})`;
+    } else {
+      hidden.forEach(el => el.classList.remove("fbCard--hidden"));
+      btn.textContent = "Zwiń";
+    }
+  });
+}
+
 // ===== FB/IG GALLERY (from our API) =====
 // Ustaw prawdziwy URL backendu gdy będzie gotowy, np. "https://twoj-worker.workers.dev/posts"
 const FB_API_URL = "";
@@ -357,9 +395,13 @@ async function loadFB(){
   const grid = document.getElementById("fbGrid");
   if(!grid) return;
 
-  // Brak API — zostaw sekcję widoczną, pokaż placeholder
+  // Brak API — renderuj z LOCAL_GALLERY z data.js
   if(!FB_API_URL){
-    if(grid) grid.innerHTML = `<div class="muted">Galeria wkrótce.</div>`;
+    if(!LOCAL_GALLERY || LOCAL_GALLERY.length === 0){
+      if(grid) grid.innerHTML = `<div class="muted">Brak zdjęć w galerii.</div>`;
+      return;
+    }
+    renderGallery(grid, LOCAL_GALLERY);
     return;
   }
 
