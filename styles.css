@@ -855,6 +855,12 @@ details p {
   box-shadow: 0 10px 26px rgba(16, 24, 40, .04);
 }
 
+.lineItem--info {
+  background: var(--brandSoft, var(--soft));
+  border-style: dashed;
+  align-items: center;
+}
+
 .qty {
   display: flex;
   gap: .4rem;

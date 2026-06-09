@@ -253,7 +253,7 @@ function updateUI(){
     return;
   }
 
-  items.innerHTML = Array.from(cart.entries()).map(([key, qty]) => {
+  const itemsHTML = Array.from(cart.entries()).map(([key, qty]) => {
     const item = resolveCartItem(key);
     if(!item) return "";
     const { p, sizeLabel, flavor, price, serves } = item;
@@ -274,6 +274,19 @@ function updateUI(){
       </div>
     `;
   }).join("");
+
+  // Pozycja transportu — tylko przy dowozie, bez ceny
+  const transportHTML = deliveryMode === "dowoz" ? `
+      <div class="lineItem lineItem--info">
+        <div>
+          <strong>🚗 Transport (dowóz)</strong>
+          <div class="muted tiny">Cena ustalana indywidualnie — może ulec zmianie.</div>
+        </div>
+        <div class="muted">do uzgodnienia</div>
+      </div>
+    ` : "";
+
+  items.innerHTML = itemsHTML + transportHTML;
 }
 
 // ====== BOOKED DATE VALIDATION ======
@@ -333,6 +346,7 @@ function buildText(){
     lines.push("Odbiór osobisty");
   } else if(deliveryMode === "dowoz"){
     lines.push(`Dowóz: ${where || "(brak adresu)"}`);
+    lines.push("Transport: cena ustalana indywidualnie (może ulec zmianie)");
   }
 
   if(notes){
@@ -506,7 +520,7 @@ function setDeliveryMode(mode){
     modeHint.textContent = isDowoz ? "Podaj adres dowozu." : "Odbiór osobisty — adres nie jest potrzebny.";
   }
 
-  validateForm();
+  updateUI(); // odśwież koszyk (pozycja transportu) + walidacja
 }
 
 modeBtns.forEach(b => b.addEventListener("click", () => setDeliveryMode(b.dataset.mode)));
