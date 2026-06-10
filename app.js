@@ -280,7 +280,7 @@ function updateUI(){
       <div class="lineItem lineItem--info">
         <div>
           <strong>🚗 Transport (dowóz)</strong>
-          <div class="muted tiny">Cena ustalana indywidualnie — może ulec zmianie.</div>
+          <div class="muted tiny">Cena ustalana indywidualnie — cena zamówienia moze ulec zmianie</div>
         </div>
         <div class="muted">do uzgodnienia</div>
       </div>
