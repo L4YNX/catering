@@ -73,10 +73,11 @@
     <!-- HERO: teraz 1-kolumnowy (galeria szeroko) -->
     <section class="hero hero--wide">
       <div class="hero__copy">
-        <p class="eyebrow">Na zimno • na ciepło • wege • na słodko</p>
+        <p class="eyebrow">Catering w Żorach • na zimno • na ciepło • wege • na słodko</p>
         <h1>Paterki, <span>gotowe do podania</span>.</h1>
         <p class="lead">
-          Wybierz Paterke/Koryto, wpisz termin i wyślij zamówienie przez WhatsApp (albo zadzwoń).
+          Patery, koryta i sałatki domowej roboty na każdą okazję. Złóż zamówienie w 2 minuty —
+          przez WhatsApp lub telefon, z odbiorem albo dowozem.
         </p>
 
         <section class="fbGallery" aria-label="Galeria z Facebooka">
@@ -91,7 +92,8 @@
         </section>
 
         <div class="hero__cta">
-          <a class="btn" href="#katalog">Zobacz menu</a>
+          <a class="btn btn--lg" href="#katalog">Zobacz menu</a>
+          <a class="btn btn--ghost btn--lg" href="tel:+48508014420">Zadzwoń</a>
         </div>
 
         <div class="badges">
@@ -127,7 +129,7 @@
       </div>
 
       <div class="search">
-        <input id="q" placeholder="Szukaj (np. patera nr. 1, koryto nr. 1)..." />
+        <input id="q" type="search" aria-label="Szukaj w menu" placeholder="Szukaj (np. patera nr. 1, koryto nr. 1)..." />
       </div>
     </section>
 
@@ -200,7 +202,7 @@
         </details>
         <details>
           <summary>Czy mogę zmienić skład?</summary>
-          <p>Tak, w miarę dostępności — dopisz w wiadomości.</p>
+          <p>Najlepiej zapytac przy składaniu zamówienia</p>
         </details>
         <details>
           <summary>Jak działa “na ciepło”?</summary>
@@ -209,6 +211,10 @@
         <details>
           <summary>Jak płacę?</summary>
           <p>BLIK / karta / gotówka</p>
+        </details>
+        <details id="alergeny">
+          <summary>Alergeny</summary>
+          <p>Informacje o alergenach w poszczególnych pozycjach podajemy na życzenie — wystarczy zapytać przy składaniu zamówienia (w wiadomości lub telefonicznie).</p>
         </details>
       </div>
     </section>
@@ -275,10 +281,37 @@
 
   <button class="toTop" id="toTop" aria-label="Wróć na górę">↑</button>
 
+  <div class="modal" id="contactModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+    <div class="modal__backdrop" data-close-contact></div>
+    <div class="modal__card">
+      <button class="modal__close" id="contactClose" aria-label="Zamknij">×</button>
+      <h3 class="modal__title" id="contactTitle">Kontakt</h3>
+      <p class="muted">Wybierz, jak chcesz się skontaktować.</p>
+      <div class="contactOpts">
+        <a class="contactOpt" href="tel:+48508014420">
+          <span class="contactOpt__ico" aria-hidden="true">📞</span>
+          <span class="contactOpt__text"><strong>Zadzwoń</strong><span class="muted tiny">508 014 420</span></span>
+        </a>
+        <a class="contactOpt" href="https://wa.me/48508014420" target="_blank" rel="noopener">
+          <span class="contactOpt__ico" aria-hidden="true">💬</span>
+          <span class="contactOpt__text"><strong>WhatsApp</strong><span class="muted tiny">Napisz wiadomość</span></span>
+        </a>
+        <a class="contactOpt" href="https://www.facebook.com/justyna.obara" target="_blank" rel="noopener">
+          <span class="contactOpt__ico" aria-hidden="true">f</span>
+          <span class="contactOpt__text"><strong>Facebook</strong><span class="muted tiny">facebook.com/justyna.obara</span></span>
+        </a>
+      </div>
+    </div>
+  </div>
+
   <footer class="footer">
     <div class="container footer__inner">
       <span>© <span id="year"></span> Paterka</span>
-      <span class="muted">Kontakt • Alergeny • Regulamin</span>
+      <nav class="footer__links" aria-label="Stopka">
+        <a href="tel:+48508014420" data-contact>Kontakt</a>
+        <a href="#alergeny">Alergeny</a>
+        <a href="regulamin.html">Regulamin</a>
+      </nav>
     </div>
   </footer>
 </body>

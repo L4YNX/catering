@@ -234,6 +234,14 @@ function setFilter(filter){
 }
 
 // ====== CART UI ======
+function bumpCount(){
+  const c = $("count");
+  if(!c) return;
+  c.classList.remove("count--bump");
+  void c.offsetWidth; // restart animacji
+  c.classList.add("count--bump");
+}
+
 function updateUI(){
   const count = Array.from(cart.values()).reduce((a,b)=>a+b,0);
   
@@ -392,6 +400,19 @@ document.addEventListener("click", (e) => {
     }
     cart.set(key, (cart.get(key) || 0) + addQty);
     updateUI();
+
+    // natychmiastowy feedback wizualny
+    if(e.target.classList.contains("add")){
+      const btn = e.target;
+      btn.classList.add("is-added");
+      btn.textContent = "Dodano ✓";
+      clearTimeout(btn._addedT);
+      btn._addedT = setTimeout(() => {
+        btn.classList.remove("is-added");
+        btn.textContent = "Dodaj";
+      }, 900);
+    }
+    bumpCount();
     return;
   }
 
@@ -690,6 +711,41 @@ function renderPopular(){
     `;
   }).join("");
 }
+
+// ====== MODAL KONTAKT ======
+const contactModal = $("contactModal");
+
+function openContact(){
+  contactModal?.classList.add("is-open");
+  contactModal?.setAttribute("aria-hidden", "false");
+}
+function closeContact(){
+  contactModal?.classList.remove("is-open");
+  contactModal?.setAttribute("aria-hidden", "true");
+}
+
+$$("[data-contact]").forEach(el => el.addEventListener("click", (e) => {
+  e.preventDefault();
+  openContact();
+}));
+$("contactClose")?.addEventListener("click", closeContact);
+$$("[data-close-contact]").forEach(el => el.addEventListener("click", closeContact));
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape") closeContact();
+});
+
+// ====== ROZWIJANIE WSKAZANEGO AKORDEONU (#hash) ======
+function openHashTarget(){
+  const id = (location.hash || "").slice(1);
+  if(!id) return;
+  const el = document.getElementById(id);
+  if(el && el.tagName === "DETAILS"){
+    el.open = true;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+window.addEventListener("hashchange", openHashTarget);
+window.addEventListener("load", openHashTarget);
 
 // ====== PRZEJŚCIE DO POZYCJI W MENU ======
 function gotoProduct(id){

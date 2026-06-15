@@ -1,6 +1,6 @@
 const SITE_CONFIG = {
   phone: "48537388889",
-  facebookUrl: "https://www.facebook.com/justyna.obara",
+  facebookUrl: "https://www.facebook.com/justyna.obara/photos",
   businessName: "Paterka",
 };
 
