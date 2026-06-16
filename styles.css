@@ -1368,7 +1368,8 @@ details p {
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     gap: .75rem;
-    padding-bottom: .5rem;
+    /* górny/dolny luz, by hover (uniesienie + cień) nie był obcinany */
+    padding: .5rem .2rem .6rem;
     scrollbar-width: none;
   }
 
@@ -1379,6 +1380,26 @@ details p {
   .miniList .miniItem {
     flex: 0 0 78vw;
     scroll-snap-align: start;
+  }
+
+  /* Menu: każda kategoria jako pozioma karuzela (karta ~80% szerokości) */
+  .acc .grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: .8rem;
+    padding: .5rem .2rem .6rem;
+    scrollbar-width: none;
+  }
+
+  .acc .grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .acc .grid > .card {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
   }
 }
 
