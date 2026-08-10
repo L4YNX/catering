@@ -51,7 +51,7 @@ const BOOKED = BOOKED_DATES; // zajęte terminy z data.js
   ale ta witryna nie wysyła zamówień do żadnego serwera — otwiera tylko WhatsApp.
   ============================================================================
 */
-const ORDERS_ENABLED = true;
+const ORDERS_ENABLED = false;
 const ORDERS_DISABLED_MESSAGE = "Zamawianie przez stronę jest na razie niedostępne. Prosimy o kontakt przez Facebooka lub WhatsApp :)";
 
 /*
