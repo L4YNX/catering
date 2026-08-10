@@ -52,7 +52,7 @@ const BOOKED = BOOKED_DATES; // zajęte terminy z data.js
   ============================================================================
 */
 const ORDERS_ENABLED = false;
-const ORDERS_DISABLED_MESSAGE = "Zamawianie przez stronę jest chwilowo niedostępne. Prosimy o kontakt przez Facebooka lub WhatsApp.";
+const ORDERS_DISABLED_MESSAGE = "Zamawianie przez stronę jest niedostępne 😭. Prosimy o kontakt przez Facebooka lub WhatsApp.";
 
 /*
   [JS-01] POŁĄCZENIE Z ELEMENTAMI HTML
