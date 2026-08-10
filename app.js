@@ -1,13 +1,65 @@
-// ====== BASIC SAFE HELPERS ======
+/*
+  ============================================================================
+  MAPA PLIKU app.js — LOGIKA I INTERAKCJE STRONY
+  ============================================================================
+  Ten plik łączy dane z data.js z elementami index.html. Generuje produkty,
+  obsługuje filtrowanie, koszyk, panel zamówienia i wiadomość WhatsApp.
+
+  Użyj ⌘ + F i wyszukaj:
+  [JS-00] Główny przełącznik zamówień
+  [JS-01] Podstawowe narzędzia i połączenie z HTML
+  [JS-02] Stan strony oraz localStorage
+  [JS-03] Tworzenie kart i renderowanie katalogu
+  [JS-04] Filtry i wyszukiwarka
+  [JS-05] Koszyk, ilości i suma
+  [JS-06] Terminy i tekst wiadomości WhatsApp
+  [JS-07] Kliknięcia: dodawanie, usuwanie i wybór wariantów
+  [JS-08] Panel zamówienia i menu mobilne
+  [JS-09] Odbiór, dowóz i checklista
+  [JS-10] Galeria
+  [JS-11] Godziny i Najpopularniejsze
+  [JS-12] Kontakt oraz drobne ułatwienia nawigacji
+  [JS-13] Uruchomienie strony
+
+  Zanim zmienisz nazwę id lub klasy, wyszukaj ją w całym projekcie. Wiele nazw
+  jest wspólnych dla HTML, CSS i JavaScriptu.
+  ============================================================================
+*/
+
+// ====== [JS-01] PODSTAWOWE NARZĘDZIA ======
 const $ = (id) => document.getElementById(id);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 function money(n){ return `${n} zł`; }
 
-// ====== SETTINGS FROM data.js ======
+// Ustawienia są pobierane z data.js. Tam zmieniaj telefon i terminy.
 const WA_NUMBER = SITE_CONFIG.phone; // numer z data.js, bez + i bez spacji
 const BOOKED = BOOKED_DATES; // zajęte terminy z data.js
 
-// ====== DOM REFERENCES (SAFE) ======
+/*
+  ============================================================================
+  [JS-00] GŁÓWNY PRZEŁĄCZNIK ZAMÓWIEŃ
+  ============================================================================
+  true  = klienci mogą dodawać produkty i wysyłać zamówienie przez WhatsApp,
+  false = cały mechanizm zamawiania jest wyłączony.
+
+  Po ustawieniu false strona nadal pokazuje menu, ceny, galerię i kontakt, ale:
+  - przyciski „Dodaj” są nieaktywne,
+  - nie można otworzyć panelu zamówienia,
+  - nie można skopiować ani wysłać treści zamówienia przez WhatsApp.
+
+  To jest blokada interfejsu statycznej strony. Nie zastępuje blokady serwerowej,
+  ale ta witryna nie wysyła zamówień do żadnego serwera — otwiera tylko WhatsApp.
+  ============================================================================
+*/
+const ORDERS_ENABLED = false;
+const ORDERS_DISABLED_MESSAGE = "Zamawianie przez stronę jest chwilowo niedostępne. Prosimy o kontakt przez Facebooka lub WhatsApp.";
+
+/*
+  [JS-01] POŁĄCZENIE Z ELEMENTAMI HTML
+  Stałe poniżej przechowują znalezione elementy strony. Znak ?. oznacza:
+  "wykonaj tylko wtedy, gdy element istnieje", dzięki czemu brak jednego
+  elementu nie zatrzyma całej strony.
+*/
 const yearEl = $("year");
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
@@ -52,9 +104,18 @@ const waBtn  = $("wa");
 const copyBtn = $("copy");
 const whereEl = $("where");
 
-// ====== STATE ======
+/*
+  ============================================================================
+  [JS-02] STAN STRONY I ZAPIS KOSZYKA
+  ============================================================================
+  active przechowuje aktualny filtr, a cart jest mapą: produkt -> ilość.
+  localStorage zachowuje sam koszyk po odświeżeniu. Dane klienta, adres i uwagi
+  nie są zapisywane. Zmiana CART_STORAGE_KEY tworzy nowy, pusty koszyk.
+*/
 let active = "all";
 let cart = new Map(); // key -> qty  (key: "id" lub "id:rozmiar")
+const CART_STORAGE_KEY = "paterka-cart-v1";
+let cartRestored = false;
 
 function cartKey(id, sizeLabel, flavor){
   // klucz: "id|rozmiar|smak" (puste pola dozwolone)
@@ -86,6 +147,35 @@ function resolveCartItem(key){
   return { p, sizeLabel, flavor, price, serves };
 }
 
+// W localStorage zapisujemy wyłącznie identyfikatory produktów i ilości.
+// Nie zapisujemy adresu, uwag ani innych danych klienta.
+function restoreCart(){
+  if(cartRestored) return;
+  cartRestored = true;
+
+  try{
+    const saved = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
+    if(!Array.isArray(saved)) return;
+
+    cart = new Map(saved.filter(entry => {
+      if(!Array.isArray(entry) || entry.length !== 2) return false;
+      const [key, qty] = entry;
+      return typeof key === "string" && Number.isInteger(qty) && qty > 0 && resolveCartItem(key);
+    }));
+  }catch{
+    // Uszkodzony lub zablokowany localStorage nie może zepsuć strony.
+    cart = new Map();
+  }
+}
+
+function saveCart(){
+  try{
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(Array.from(cart.entries())));
+  }catch{
+    // Tryb prywatny może blokować zapis — koszyk nadal działa w pamięci strony.
+  }
+}
+
 function total(){
   let sum = 0;
   for(const [key, qty] of cart.entries()){
@@ -95,11 +185,26 @@ function total(){
   return sum;
 }
 
-// ====== CARD RENDER ======
+/*
+  ============================================================================
+  [JS-03] TWORZENIE POJEDYNCZEJ KARTY PRODUKTU
+  ============================================================================
+  cardHTML() dostaje jeden obiekt z PRODUCTS i zwraca tekst HTML karty.
+  Rozmiary, smaki oraz pole ilości pojawiają się automatycznie, jeśli produkt
+  ma pola sizes, flavors lub qtyInput. loading="lazy" ogranicza pobieranie
+  zdjęć znajdujących się daleko poza ekranem.
+*/
 function cardHTML(p){
   const typeLabel = TAG_LABELS[p.tags[0]] || p.tags[0];
-  const bg = p.img ? `style="background-image:url('${p.img}');"` : "";
+  // loading="lazy" działa na <img>, ale nie na CSS background-image.
+  const photo = p.img
+    ? `<img class="thumb__img" src="${p.img}" alt="${escapeHTML(p.name)}" loading="lazy" decoding="async" width="800" height="600">`
+    : "";
   const pills = p.tags.map(t => TAG_LABELS[t]).filter(Boolean).map(lbl => `<span class="pill">${lbl}</span>`).join("");
+  const addDisabled = ORDERS_ENABLED
+    ? ""
+    : `disabled aria-disabled="true" title="${escapeHTML(ORDERS_DISABLED_MESSAGE)}"`;
+  const addLabel = ORDERS_ENABLED ? "Dodaj" : "Zamawianie niedostępne";
 
   // Produkt konfigurowalny: wybór smaku/rozmiaru i/lub własny wpis
   const hasSizes   = p.sizes   && p.sizes.length   > 0;
@@ -134,7 +239,8 @@ function cardHTML(p){
 
     return `
       <article class="card" data-card-id="${p.id}">
-        <div class="thumb thumb--photo" ${bg}>
+        <div class="thumb thumb--photo">
+          ${photo}
           <span class="pTag">${typeLabel}</span>
         </div>
         <div class="cardBody">
@@ -151,7 +257,7 @@ function cardHTML(p){
           </div>
           <div class="buyRow">
             <span></span>
-            <button class="add" data-add="${p.id}" data-sized="1">Dodaj</button>
+            <button class="add" data-add="${p.id}" data-sized="1" ${addDisabled}>${addLabel}</button>
           </div>
         </div>
       </article>
@@ -161,7 +267,8 @@ function cardHTML(p){
   // Zwykły produkt
   return `
     <article class="card" data-card-id="${p.id}">
-      <div class="thumb thumb--photo" ${bg}>
+      <div class="thumb thumb--photo">
+        ${photo}
         <span class="pTag">${typeLabel}</span>
         ${p.serves ? `<span class="pTag">dla ${p.serves}</span>` : ""}
       </div>
@@ -174,14 +281,20 @@ function cardHTML(p){
         ${pills ? `<div class="metaRow">${pills}</div>` : ""}
         <div class="buyRow">
           <span></span>
-          <button class="add" data-add="${p.id}">Dodaj</button>
+          <button class="add" data-add="${p.id}" ${addDisabled}>${addLabel}</button>
         </div>
       </div>
     </article>
   `;
 }
 
-// ====== MAIN RENDER ======
+/*
+  ============================================================================
+  [JS-03] RENDEROWANIE CAŁEGO KATALOGU
+  ============================================================================
+  render() filtruje PRODUCTS według wyszukiwanej nazwy i wybranego tagu,
+  następnie wstawia karty do odpowiednich #grid... z index.html.
+*/
 function render(){
   const term = (q?.value || "").trim().toLowerCase();
 
@@ -226,14 +339,20 @@ function render(){
   }
 }
 
-// ====== FILTER CONTROL ======
+/* [JS-04] FILTRY — ustawia aktywny tag i ponownie renderuje katalog. */
 function setFilter(filter){
   active = filter;
   segBtns.forEach(b => b.classList.toggle("is-active", b.dataset.filter === filter));
   render();
 }
 
-// ====== CART UI ======
+/*
+  ============================================================================
+  [JS-05] WIDOK KOSZYKA, ILOŚCI I SUMA
+  ============================================================================
+  updateUI() jest centralną funkcją koszyka. Po każdej zmianie zapisuje koszyk,
+  aktualizuje licznik, sumę, listę pozycji i ponownie uruchamia walidację.
+*/
 function bumpCount(){
   const c = $("count");
   if(!c) return;
@@ -243,8 +362,9 @@ function bumpCount(){
 }
 
 function updateUI(){
+  saveCart();
   const count = Array.from(cart.values()).reduce((a,b)=>a+b,0);
-  
+
   const countEl = $("count");
   if (countEl) countEl.textContent = count;
 
@@ -290,14 +410,19 @@ function updateUI(){
           <strong>🚗 Transport (dowóz)</strong>
           <div class="muted tiny">Cena ustalana indywidualnie — cena zamówienia moze ulec zmianie</div>
         </div>
-        <div class="muted">do uzgodnienia</div>
       </div>
     ` : "";
 
   items.innerHTML = itemsHTML + transportHTML;
 }
 
-// ====== BOOKED DATE VALIDATION ======
+/*
+  ============================================================================
+  [JS-06] SPRAWDZANIE TERMINU
+  ============================================================================
+  Data jest porównywana z BOOKED_DATES z data.js. Minimalną datą jest jutro.
+  To sprawdzenie działa w przeglądarce i nie rezerwuje terminu na serwerze.
+*/
 function isBooked(dateStr){ return BOOKED.includes(dateStr); }
 
 function validateDate(){
@@ -324,7 +449,13 @@ if(dateEl){
 
 dateEl?.addEventListener("change", validateForm);
 
-// ====== ORDER TEXT ======
+/*
+  ============================================================================
+  [JS-06] BUDOWANIE WIADOMOŚCI WHATSAPP
+  ============================================================================
+  buildText() składa produkty, ceny, termin, dowóz i uwagi w jeden czytelny
+  tekst. Zmieniając format wiadomości, edytuj lines.push(...) w tej funkcji.
+*/
 function buildText(){
   const date = dateEl?.value || "";
   const time = (timeHourEl?.value && timeMinEl?.value) ? `${timeHourEl.value}:${timeMinEl.value}` : "";
@@ -364,7 +495,13 @@ function buildText(){
   return lines.join("\n");
 }
 
-// ====== EVENTS (SAFE) ======
+/*
+  ============================================================================
+  [JS-07] KLIKNIĘCIA W PRODUKTY I KOSZYK
+  ============================================================================
+  Jeden wspólny listener obsługuje przyciski generowane dynamicznie. data-add,
+  data-inc i data-dec mówią, czy dodać produkt, zwiększyć lub zmniejszyć ilość.
+*/
 document.addEventListener("click", (e) => {
   // klik w pozycję z "Najpopularniejsze" -> przejdź do niej w menu
   const gotoEl = e.target.closest?.("[data-goto]");
@@ -380,6 +517,7 @@ document.addEventListener("click", (e) => {
 
   const add = e.target?.getAttribute?.("data-add");
   if(add){
+    if(!ORDERS_ENABLED) return;
     const id = Number(add);
     const isSized = e.target.getAttribute("data-sized");
     let key;
@@ -418,6 +556,7 @@ document.addEventListener("click", (e) => {
 
   const inc = e.target?.getAttribute?.("data-inc");
   if(inc){
+    if(!ORDERS_ENABLED) return;
     cart.set(inc, (cart.get(inc)||0) + 1);
     updateUI();
     return;
@@ -425,6 +564,7 @@ document.addEventListener("click", (e) => {
 
   const dec = e.target?.getAttribute?.("data-dec");
   if(dec){
+    if(!ORDERS_ENABLED) return;
     const next = (cart.get(dec)||0) - 1;
     if(next <= 0) cart.delete(dec);
     else cart.set(dec, next);
@@ -452,10 +592,71 @@ segBtns.forEach(btn => btn.addEventListener("click", () => {
 q?.addEventListener("input", render);
 
 // panel open/close
-function openPanel(){ panel?.classList.add("is-open"); panel?.setAttribute("aria-hidden","false"); }
+function openPanel(){
+  if(!ORDERS_ENABLED) return;
+  panel?.classList.add("is-open");
+  panel?.setAttribute("aria-hidden","false");
+}
 function closePanel(){ panel?.classList.remove("is-open"); panel?.setAttribute("aria-hidden","true"); }
 
-// ====== HAMBURGER NAV (mobile) ======
+// Ustawia stan stałych przycisków, które istnieją bezpośrednio w index.html.
+function applyOrderingAvailability(){
+  const topOrderButton = $('openPanel');
+  const heroOrderButton = $('openPanel2');
+  const orderEntryButtons = [topOrderButton, heroOrderButton];
+  orderEntryButtons.forEach(btn => {
+    if(!btn) return;
+    btn.disabled = !ORDERS_ENABLED;
+    btn.setAttribute("aria-disabled", ORDERS_ENABLED ? "false" : "true");
+    btn.title = ORDERS_ENABLED ? "" : ORDERS_DISABLED_MESSAGE;
+  });
+
+  if(topOrderButton){
+    topOrderButton.setAttribute(
+      "aria-label",
+      ORDERS_ENABLED ? "Podgląd zamówienia" : ORDERS_DISABLED_MESSAGE
+    );
+  }
+  if(heroOrderButton){
+    heroOrderButton.textContent = ORDERS_ENABLED ? "Otwórz zamówienie" : "Zamawianie niedostępne";
+  }
+
+  /*
+    Przy wyłączonych zamówieniach pokazujemy czytelną informację pod przyciskami
+    w hero. Są tu zwykłe linki kontaktowe — nie otwierają koszyka ani nie tworzą
+    automatycznej wiadomości z zamówieniem.
+  */
+  let notice = $('ordersDisabledNotice');
+  if(!ORDERS_ENABLED && !notice){
+    notice = document.createElement('div');
+    notice.id = 'ordersDisabledNotice';
+    notice.className = 'ordersDisabledNotice';
+    notice.setAttribute('role', 'status');
+    notice.innerHTML = `
+      <strong>Zamawianie przez stronę jest chwilowo niedostępne.</strong>
+      <span>
+        Prosimy o kontakt przez
+        <a href="https://wa.me/${WA_NUMBER}" target="_blank" rel="noopener">WhatsApp</a>
+        lub
+        <a href="${SITE_CONFIG.facebookUrl}" target="_blank" rel="noopener">Facebooka</a>.
+      </span>
+    `;
+
+    document.querySelector('.hero__cta')?.insertAdjacentElement('afterend', notice);
+  }
+  if(notice) notice.hidden = ORDERS_ENABLED;
+
+  document.body.classList.toggle("orders-disabled", !ORDERS_ENABLED);
+  if(!ORDERS_ENABLED) closePanel();
+}
+
+/*
+  ============================================================================
+  [JS-08] PANEL ZAMÓWIENIA I MENU MOBILNE
+  ============================================================================
+  openPanel/closePanel sterują koszykiem z boku. setNav steruje hamburgerem.
+  Klasa nav-open zmienia wygląd przez reguły zapisane w styles.css.
+*/
 const topBar = document.querySelector(".top");
 const navToggle = $("navToggle");
 const navEl = $("nav");
@@ -495,6 +696,7 @@ $("closePanel")?.addEventListener("click", closePanel);
 
 // actions
 $("copy")?.addEventListener("click", async () => {
+  if(!ORDERS_ENABLED) return;
   if(!validateForm()) return;
 
   try{
@@ -506,6 +708,7 @@ $("copy")?.addEventListener("click", async () => {
 });
 
 $("wa")?.addEventListener("click", () => {
+  if(!ORDERS_ENABLED) return;
   if(!validateForm()) return;
 
   const txt = encodeURIComponent(buildText());
@@ -517,12 +720,19 @@ $("clear")?.addEventListener("click", () => {
   updateUI();
 });
 
-// ====== ODBIÓR / DOWÓZ ======
+/*
+  ============================================================================
+  [JS-09] ODBIÓR, DOWÓZ I WALIDACJA FORMULARZA
+  ============================================================================
+  Przy dowozie pokazujemy adres. validateForm() sprawdza wszystkie wymagania,
+  aktualizuje checklistę i dopiero wtedy odblokowuje Kopiuj/WhatsApp.
+*/
 const modeBtns = $$("#modeToggle .modeBtn");
 const modeHint = $("modeHint");
 let deliveryMode = null; // "odbior" | "dowoz"
 
 function setDeliveryMode(mode){
+  if(!ORDERS_ENABLED) return;
   deliveryMode = mode;
   const isDowoz = mode === "dowoz";
 
@@ -557,7 +767,26 @@ function validateForm(){
     ? true
     : (whereEl?.value || "").trim().length >= 5;
   const dateOk = validateDate();
-  const canSend = hasProducts && hasDate && hasTime && hasMode && addrOk && dateOk;
+  const canSend = ORDERS_ENABLED && hasProducts && hasDate && hasTime && hasMode && addrOk && dateOk;
+
+  // Checklista wyjaśnia użytkownikowi, co blokuje wysłanie zamówienia.
+  const checklist = $("orderChecklist");
+  const checklistTitle = $("checklistTitle");
+  const checks = { products: hasProducts, date: hasDate && dateOk, time: hasTime, mode: hasMode, address: addrOk };
+  Object.entries(checks).forEach(([name, ok]) => {
+    const row = checklist?.querySelector(`[data-requirement="${name}"]`);
+    if(!row) return;
+    if(name === "address") row.hidden = deliveryMode !== "dowoz";
+    row.classList.toggle("is-done", ok);
+    const icon = row.querySelector("span");
+    if(icon) icon.textContent = ok ? "✓" : "○";
+  });
+  checklist?.classList.toggle("is-complete", canSend);
+  if(checklistTitle){
+    checklistTitle.textContent = !ORDERS_ENABLED
+      ? ORDERS_DISABLED_MESSAGE
+      : (canSend ? "Zamówienie gotowe do wysłania" : "Dokończ zamówienie");
+  }
 
   [waBtn, copyBtn].forEach(btn => {
     if(!btn) return;
@@ -571,12 +800,24 @@ dateEl?.addEventListener("input", validateForm);
 timeHourEl?.addEventListener("change", validateForm);
 timeMinEl?.addEventListener("change", validateForm);
 
-// ===== GALLERY RENDER =====
+/*
+  ============================================================================
+  [JS-10] GALERIA
+  ============================================================================
+  Domyślnie używa LOCAL_GALLERY z data.js. Jeśli kiedyś ustawisz FB_API_URL,
+  strona spróbuje pobierać wpisy z zewnętrznego API. Pierwsze dwa obrazy są
+  ładowane od razu, ponieważ galeria znajduje się wysoko w sekcji hero.
+  Dopiero dalsze realizacje korzystają z lazy-loading.
+*/
 function renderGallery(grid, posts){
   const SHOW = 3;
-  grid.innerHTML = posts.map(p => `
+  grid.innerHTML = posts.map((p, index) => `
     <a class="fbCard" href="${p.url || p.permalink_url}" target="_blank" rel="noopener">
-      <div class="fbImg" style="background-image:url('${p.img || p.image || ""}')"></div>
+      <img class="fbImg" src="${p.img || p.image || ""}"
+           alt="${escapeHTML(p.alt || p.text || p.message || "Realizacja cateringu Paterka")}"
+           loading="${index < 2 ? "eager" : "lazy"}"
+           ${index < 2 ? 'fetchpriority="high"' : ''}
+           decoding="async" width="800" height="500">
       <div class="fbBody">
         <div class="fbText">${escapeHTML(p.text || p.message || "")}</div>
         <div class="fbMeta">${new Date(p.date || p.created_time).toLocaleDateString("pl-PL")}</div>
@@ -609,7 +850,7 @@ function renderGallery(grid, posts){
   });
 }
 
-// ===== FB/IG GALLERY (from our API) =====
+// [JS-10] OPCJONALNE API FACEBOOK/INSTAGRAM — obecnie wyłączone pustym URL-em.
 // Ustaw prawdziwy URL backendu gdy będzie gotowy, np. "https://twoj-worker.workers.dev/posts"
 const FB_API_URL = "";
 
@@ -642,9 +883,13 @@ async function loadFB(){
       return;
     }
 
-    grid.innerHTML = posts.map(p => `
+    grid.innerHTML = posts.map((p, index) => `
       <a class="fbCard" href="${p.permalink_url}" target="_blank" rel="noopener">
-        <div class="fbImg" style="background-image:url('${p.image || ""}')"></div>
+        <img class="fbImg" src="${p.image || ""}"
+             alt="${escapeHTML(p.alt || p.message || "Realizacja cateringu Paterka")}"
+             loading="${index < 2 ? "eager" : "lazy"}"
+             ${index < 2 ? 'fetchpriority="high"' : ''}
+             decoding="async" width="800" height="500">
         <div class="fbBody">
           <div class="fbText">${escapeHTML(p.message || "Zobacz post")}</div>
           <div class="fbMeta">${new Date(p.created_time).toLocaleDateString("pl-PL")}</div>
@@ -667,7 +912,7 @@ function escapeHTML(s){
 // odpal po starcie
 window.addEventListener("pageshow", loadFB);
 
-// ====== TIME SELECTS ======
+/* [JS-11] GENEROWANIE GODZIN — zakres 08:00–21:45 co 15 minut. */
 function fillTimeOptions(){
   if(!timeHourEl || !timeMinEl) return;
   if(timeHourEl.options.length > 1) return;
@@ -685,7 +930,7 @@ function fillTimeOptions(){
   });
 }
 
-// ====== POPULAR ======
+/* [JS-11] NAJPOPULARNIEJSZE — wybiera produkty z popular: true w data.js. */
 function renderPopular(){
   const list = document.getElementById("popularList");
   if(!list) return;
@@ -712,7 +957,13 @@ function renderPopular(){
   }).join("");
 }
 
-// ====== MODAL KONTAKT ======
+/*
+  ============================================================================
+  [JS-12] MODAL KONTAKTU I DROBNA NAWIGACJA
+  ============================================================================
+  Modal otwierają elementy z data-contact. Dalsze funkcje rozwijają sekcję
+  wskazaną hashem, przewijają do produktu i pokazują przycisk powrotu na górę.
+*/
 const contactModal = $("contactModal");
 
 function openContact(){
@@ -734,7 +985,7 @@ document.addEventListener("keydown", (e) => {
   if(e.key === "Escape") closeContact();
 });
 
-// ====== ROZWIJANIE WSKAZANEGO AKORDEONU (#hash) ======
+// [JS-12] Otwiera <details>, jeśli jego id znajduje się po # w adresie.
 function openHashTarget(){
   const id = (location.hash || "").slice(1);
   if(!id) return;
@@ -747,7 +998,7 @@ function openHashTarget(){
 window.addEventListener("hashchange", openHashTarget);
 window.addEventListener("load", openHashTarget);
 
-// ====== PRZEJŚCIE DO POZYCJI W MENU ======
+// [JS-12] Przejście z Najpopularniejszych do właściwej karty w katalogu.
 function gotoProduct(id){
   // wyczyść szukajkę i pokaż wszystkie kategorie, by pozycja była widoczna
   if(q) q.value = "";
@@ -774,7 +1025,7 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// ====== SCROLL TO TOP ======
+// [JS-12] Przycisk powrotu na górę pojawia się po przewinięciu 300 px.
 const toTopBtn = $("toTop");
 window.addEventListener("scroll", () => {
   toTopBtn?.classList.toggle("is-visible", window.scrollY > 300);
@@ -783,10 +1034,18 @@ toTopBtn?.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-// ====== BOOT (100% reliable) ======
+/*
+  ============================================================================
+  [JS-13] START APLIKACJI
+  ============================================================================
+  boot() uruchamia wszystkie elementy w odpowiedniej kolejności. Jeśli dodasz
+  nową funkcję wymagającą startu strony, wywołaj ją właśnie tutaj.
+*/
 function boot(){
+  restoreCart();
   Object.values(accDetails).forEach(d => { if(d) d.open = true; });
   setFilter("all");
+  applyOrderingAvailability();
 
   fillTimeOptions();
   renderPopular();

@@ -1,6 +1,44 @@
 <!doctype html>
+<!--
+  ============================================================================
+  MAPA PLIKU index.html
+  ============================================================================
+  Ten plik zawiera SZKIELET strony: kolejność sekcji, teksty stałe, przyciski
+  oraz puste miejsca, które JavaScript później wypełnia produktami.
+
+  Najszybsza nawigacja: naciśnij ⌘ + F i wyszukaj wybrane oznaczenie:
+  [HTML-01] Ustawienia strony, Google i udostępnianie linku
+  [HTML-02] Górne menu oraz przycisk zamówienia
+  [HTML-03] Pierwszy ekran i galeria
+  [HTML-04] Najpopularniejsze pozycje
+  [HTML-05] Filtry i wyszukiwarka
+  [HTML-06] Kategorie katalogu
+  [HTML-07] Instrukcja składania zamówienia
+  [HTML-08] Najczęstsze pytania
+  [HTML-09] Wysuwany panel zamówienia
+  [HTML-10] Okno kontaktu
+  [HTML-11] Stopka
+
+  WAŻNE POŁĄCZENIA:
+  - produkty nie są wpisane tutaj — znajdują się w data.js,
+  - elementy z id, np. id="gridCold", wypełnia app.js,
+  - klasy, np. class="hero", są stylowane w styles.css,
+  - nie zmieniaj nazw id bez jednoczesnej zmiany ich w app.js.
+  ============================================================================
+-->
 <html lang="pl">
 <head>
+  <!--
+    ==========================================================================
+    [HTML-01] USTAWIENIA STRONY, SEO I WYGLĄD LINKU
+    ==========================================================================
+    Tutaj zmienisz tytuł karty przeglądarki, opis w Google oraz informacje
+    widoczne po wysłaniu linku przez WhatsApp/Facebook.
+
+    Po zmianie domeny popraw także canonical, og:url, og:image, robots.txt
+    i sitemap.xml. Kolejność data.js -> app.js jest celowa: app.js korzysta
+    z danych, które muszą zostać wczytane wcześniej.
+  -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Paterka Justyna Obara | Catering Żory – patery, koryta, sałatki</title>
@@ -43,6 +81,14 @@
 </head>
 
 <body id="top">
+  <!--
+    ==========================================================================
+    [HTML-02] GÓRNE MENU I LICZNIK ZAMÓWIENIA
+    ==========================================================================
+    Menu prowadzi do sekcji przez ich id: #katalog, #jak i #faq.
+    Licznik #count oraz otwieranie panelu #openPanel obsługuje app.js.
+    Wersję mobilną tego obszaru znajdziesz w styles.css pod [CSS-10].
+  -->
   <header class="top">
     <div class="container top__inner">
       <a class="brand" href="#top"><img class="logo" src="assets/logo.png" alt="Logo Paterki"></a>
@@ -72,7 +118,14 @@
   </header>
 
   <main class="container">
-    <!-- HERO: teraz 1-kolumnowy (galeria szeroko) -->
+    <!--
+      ========================================================================
+      [HTML-03] HERO — PIERWSZY EKRAN I GALERIA
+      ========================================================================
+      To pierwsza rzecz widziana przez klienta. Tutaj zmieniaj główne hasło,
+      krótki opis i teksty przycisków. Same elementy galerii pochodzą z tablicy
+      LOCAL_GALLERY w data.js i są wstawiane do #fbGrid przez app.js.
+    -->
     <section class="hero hero--wide">
       <div class="hero__copy">
         <p class="eyebrow">Catering w Żorach • na zimno • na ciepło • wege</p>
@@ -106,7 +159,13 @@
       </div>
     </section>
 
-    <!-- NAJPOPULARNIEJSZE: przeniesione POD HERO -->
+    <!--
+      ========================================================================
+      [HTML-04] NAJPOPULARNIEJSZE
+      ========================================================================
+      Ta sekcja jest pusta w HTML. app.js wybiera z data.js produkty mające
+      popular: true i automatycznie wstawia je do #popularList.
+    -->
     <section class="popSection">
       <div class="hero__card">
         <div class="heroCard__top">
@@ -119,6 +178,14 @@
       </div>
     </section>
 
+    <!--
+      ========================================================================
+      [HTML-05] FILTRY I WYSZUKIWARKA
+      ========================================================================
+      data-filter musi odpowiadać tagowi z data.js, np. "vege" albo "hot".
+      Dodanie nowego filtra wymaga również wpisu w TAG_LABELS oraz obsługi
+      odpowiedniej kategorii w app.js.
+    -->
     <section class="controls">
       <div class="seg" role="tablist" aria-label="Filtry">
         <button class="seg__btn is-active" data-filter="all">Wszystko</button>
@@ -135,6 +202,14 @@
       </div>
     </section>
 
+    <!--
+      ========================================================================
+      [HTML-06] KATALOG I KATEGORIE
+      ========================================================================
+      Każdy <details> jest rozwijaną kategorią. Elementy #gridCold, #gridHot itd.
+      są kontenerami — karty produktów generuje app.js na podstawie PRODUCTS.
+      Atrybut open oznacza, że kategoria jest rozwinięta po wejściu na stronę.
+    -->
     <section id="katalog" class="catalog">
       <div class="catalog__head">
         <h2>Menu</h2>
@@ -174,6 +249,13 @@
       </div>
     </section>
 
+    <!--
+      ========================================================================
+      [HTML-07] JAK ZAMÓWIĆ
+      ========================================================================
+      To zwykła treść informacyjna. Można ją bezpiecznie zmieniać bez ruszania
+      JavaScriptu, o ile pozostawisz id="jak" używane przez górne menu.
+    -->
     <section id="jak" class="how">
       <div class="how__grid">
         <div class="howCard">
@@ -195,6 +277,13 @@
       </div>
     </section>
 
+    <!--
+      ========================================================================
+      [HTML-08] FAQ I ALERGENY
+      ========================================================================
+      Każde <details> to osobne pytanie. Nowe pytania możesz kopiować wraz
+      z summary i p. id="alergeny" zostaw, bo prowadzi do niego link w stopce.
+    -->
     <section id="faq" class="faq">
       <h2>FAQ</h2>
       <div class="faq__grid">
@@ -222,6 +311,19 @@
     </section>
   </main>
 
+  <!--
+    ==========================================================================
+    [HTML-09] WYSUWANY PANEL ZAMÓWIENIA
+    ==========================================================================
+    Ten panel jest odpowiednikiem koszyka. app.js:
+    - wstawia pozycje do #items,
+    - liczy sumę w #total,
+    - sprawdza datę, godzinę, sposób odbioru i adres,
+    - aktualizuje checklistę,
+    - buduje tekst wysyłany do WhatsAppa.
+
+    Zachowaj istniejące id pól, ponieważ JavaScript wyszukuje je po nazwie.
+  -->
   <aside class="panel" id="panel" aria-hidden="true">
     <div class="panel__top">
       <div>
@@ -261,6 +363,19 @@
         <span>Uwagi / alergie</span>
         <input id="notes" placeholder="np. bez orzechów, zamiana na wege…" />
       </label>
+
+      <!-- Lista jest aktualizowana przez validateForm(), dzięki czemu wiadomo,
+           dlaczego przycisk WhatsApp jest jeszcze nieaktywny. -->
+      <div class="orderChecklist field--full" id="orderChecklist" aria-live="polite">
+        <strong id="checklistTitle">Dokończ zamówienie</strong>
+        <ul>
+          <li data-requirement="products"><span aria-hidden="true">○</span> Dodaj przynajmniej jeden produkt</li>
+          <li data-requirement="date"><span aria-hidden="true">○</span> Wybierz datę</li>
+          <li data-requirement="time"><span aria-hidden="true">○</span> Wybierz godzinę</li>
+          <li data-requirement="mode"><span aria-hidden="true">○</span> Wybierz odbiór lub dowóz</li>
+          <li data-requirement="address" hidden><span aria-hidden="true">○</span> Podaj adres dowozu</li>
+        </ul>
+      </div>
     </div>
 
     <div class="panel__items" id="items"></div>
@@ -283,6 +398,13 @@
 
   <button class="toTop" id="toTop" aria-label="Wróć na górę">↑</button>
 
+  <!--
+    ==========================================================================
+    [HTML-10] OKNO KONTAKTU
+    ==========================================================================
+    Otwiera się po kliknięciu elementu z data-contact. Numery i linki widoczne
+    tutaj trzeba zmienić również w SITE_CONFIG w data.js oraz danych SEO.
+  -->
   <div class="modal" id="contactModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
     <div class="modal__backdrop" data-close-contact></div>
     <div class="modal__card">
@@ -306,6 +428,13 @@
     </div>
   </div>
 
+  <!--
+    ==========================================================================
+    [HTML-11] STOPKA
+    ==========================================================================
+    Rok w #year uzupełnia automatycznie app.js. Link do regulaminu prowadzi do
+    osobnego pliku regulamin.html.
+  -->
   <footer class="footer">
     <div class="container footer__inner">
       <span>© <span id="year"></span> Paterka</span>

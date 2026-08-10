@@ -1,6 +1,33 @@
 <!doctype html>
+<!--
+===============================================================================
+ MAPA PLIKU: regulamin.html
+===============================================================================
+ To osobna, statyczna podstrona z regulaminem. Korzysta z tego samego
+ styles.css co strona główna, ale nie potrzebuje app.js ani data.js.
+
+ Nawigacja przez Cmd + F:
+   [REG-01] Ustawienia podstrony
+   [REG-02] Górna nawigacja
+   [REG-03] Dane firmy i sposób składania zamówień
+   [REG-04] Realizacja, reklamacje, alergeny i RODO
+   [REG-05] Stopka
+
+ UWAGA: tekst jest roboczym szkicem. Wszystkie pola zapisane jako [TAKIE POLE]
+ trzeba uzupełnić, a całość zweryfikować przed uruchomieniem prawdziwej sprzedaży.
+ Komentarze HTML są widoczne tylko w kodzie, nie na gotowej stronie.
+===============================================================================
+-->
 <html lang="pl">
 <head>
+  <!--
+    ===========================================================================
+    [REG-01] USTAWIENIA PODSTRONY
+    ===========================================================================
+    Tutaj ustawiasz tytuł karty przeglądarki, ikonę i podłączasz wspólny CSS.
+    meta viewport jest konieczne, aby strona dobrze skalowała się na telefonie.
+    ===========================================================================
+  -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Regulamin zamówień | Paterka Justyna Obara</title>
@@ -16,6 +43,14 @@
 </head>
 
 <body id="top">
+  <!--
+    ===========================================================================
+    [REG-02] GÓRNA NAWIGACJA
+    ===========================================================================
+    Linki prowadzą z powrotem do konkretnych sekcji index.html. Dopisek #faq
+    oznacza: otwórz index.html i przewiń do elementu o id="faq".
+    ===========================================================================
+  -->
   <header class="top">
     <div class="container top__inner">
       <a class="brand" href="index.html#top"><img class="logo" src="assets/logo.png" alt="Logo Paterki"></a>
@@ -28,11 +63,21 @@
     </div>
   </header>
 
+  <!--
+    ===========================================================================
+    [REG-03] POCZĄTEK TREŚCI PRAWNEJ: FIRMA, ZAMÓWIENIA, CENY I PŁATNOŚCI
+    ===========================================================================
+    Klasa .legal ogranicza szerokość tekstu, żeby długie akapity były czytelne.
+    Każdy temat jest osobnym <section>, a każdy nagłówek h2 ma kolejny paragraf.
+    Przy zmianach zachowaj tę strukturę — pomaga czytelnikom i wyszukiwarkom.
+    ===========================================================================
+  -->
   <main class="container legal">
     <a class="legal__back" href="index.html">← Wróć na stronę główną</a>
     <h1 class="legal__title">Regulamin zamówień</h1>
     <p class="muted">Ostatnia aktualizacja: <strong>[DATA]</strong></p>
 
+    <!-- §1: dane sprzedawcy i podstawowy zakres regulaminu. -->
     <section>
       <h2>§1. Postanowienia ogólne</h2>
       <p>Niniejszy regulamin określa zasady składania i realizacji zamówień usług cateringowych
@@ -43,6 +88,7 @@
         Facebook: <a href="https://www.facebook.com/justyna.obara" target="_blank" rel="noopener">facebook.com/justyna.obara</a>.</p>
     </section>
 
+    <!-- §2: kanał składania zamówień i moment jego faktycznego potwierdzenia. -->
     <section>
       <h2>§2. Składanie zamówień</h2>
       <p>Zamówienia można składać poprzez skompletowanie pozycji na stronie i wysłanie ich wiadomością
@@ -54,6 +100,7 @@
         planowanym terminem odbioru lub dowozu. Dostępność terminów może być ograniczona.</p>
     </section>
 
+    <!-- §3: ceny produktów oraz osobno ustalany koszt dowozu. -->
     <section>
       <h2>§3. Ceny</h2>
       <p>Ceny podane w menu wyrażone są w złotych polskich (zł) i są cenami brutto.</p>
@@ -62,6 +109,7 @@
         przyjęciu zamówienia.</p>
     </section>
 
+    <!-- §4: dostępne formy płatności i ewentualny zadatek. -->
     <section>
       <h2>§4. Płatność</h2>
       <p>Dostępne formy płatności: BLIK, karta, gotówka. Sprzedawca może wymagać wpłaty zadatku
@@ -69,6 +117,17 @@
         ustalane są indywidualnie.</p>
     </section>
 
+    <!--
+      =========================================================================
+      [REG-04] REALIZACJA, ZMIANY, REKLAMACJE, ALERGENY I DANE OSOBOWE
+      =========================================================================
+      W tej części znajdują się informacje, które klient sprawdza zwykle już
+      po wybraniu menu: gdzie odbiera, jak zmienić zamówienie, gdzie zgłosić
+      problem oraz jak przetwarzane są jego dane. Pola w nawiasach nadal są
+      tylko miejscami do późniejszego uzupełnienia.
+      =========================================================================
+    -->
+    <!-- §5: miejsce odbioru, obszar dowozu i sposób ustalenia godziny. -->
     <section>
       <h2>§5. Realizacja — odbiór i dowóz</h2>
       <p>Zamówienie można odebrać osobiście pod adresem <strong>[ADRES ODBIORU]</strong> w ustalonym
@@ -76,6 +135,7 @@
       <p>Dokładna godzina i sposób realizacji ustalane są przy potwierdzeniu zamówienia.</p>
     </section>
 
+    <!-- §6: termin i zasady zmiany albo anulowania zamówienia. -->
     <section>
       <h2>§6. Zmiany i anulowanie zamówienia</h2>
       <p>Zmiany lub anulowanie zamówienia są możliwe nie później niż <strong>[np. 24 godziny]</strong>
@@ -83,6 +143,7 @@
         określa Sprzedawca przy potwierdzeniu zamówienia.</p>
     </section>
 
+    <!-- §7: kanał zgłoszenia reklamacji i termin odpowiedzi. -->
     <section>
       <h2>§7. Reklamacje</h2>
       <p>Reklamacje dotyczące zamówienia prosimy zgłaszać niezwłocznie, najlepiej w dniu odbioru/dowozu,
@@ -90,6 +151,7 @@
         Reklamacja zostanie rozpatrzona w terminie <strong>[np. 14 dni]</strong>.</p>
     </section>
 
+    <!-- §8: informacja o alergenach i możliwych śladowych ilościach. -->
     <section>
       <h2>§8. Alergeny</h2>
       <p>Informacje o alergenach występujących w poszczególnych pozycjach podawane są na życzenie —
@@ -97,6 +159,7 @@
         ilości ze względu na wspólne przygotowywanie. W razie potrzeby możemy zaproponować zamienniki.</p>
     </section>
 
+    <!-- §9: administrator danych, cel przetwarzania i prawa klienta. -->
     <section>
       <h2>§9. Dane osobowe (RODO)</h2>
       <p>Administratorem danych osobowych jest <strong>[NAZWA FIRMY / IMIĘ I NAZWISKO]</strong>.
@@ -106,6 +169,7 @@
         wglądu, poprawiania i usunięcia danych — w tym celu prosimy o kontakt: <strong>[E-MAIL]</strong>.</p>
     </section>
 
+    <!-- §10: data wejścia regulaminu w życie i zasady końcowe. -->
     <section>
       <h2>§10. Postanowienia końcowe</h2>
       <p>W sprawach nieuregulowanych niniejszym regulaminem zastosowanie mają przepisy prawa polskiego.
@@ -114,6 +178,15 @@
     </section>
   </main>
 
+  <!--
+    ===========================================================================
+    [REG-05] STOPKA
+    ===========================================================================
+    Stopka korzysta z tych samych klas co index.html. Rok jest tutaj wpisany
+    ręcznie, ponieważ ta podstrona nie ładuje app.js. Gdy zmieniasz dane firmy
+    w stopce strony głównej, pamiętaj sprawdzić również ten plik.
+    ===========================================================================
+  -->
   <footer class="footer">
     <div class="container footer__inner">
       <span>© <span id="year">2026</span> Paterka</span>

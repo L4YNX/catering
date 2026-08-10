@@ -1,3 +1,50 @@
+/*
+===============================================================================
+ MAPA PLIKU: styles.css
+===============================================================================
+ Ten plik odpowiada WYŁĄCZNIE za wygląd strony. Zachowanie koszyka, filtrów
+ i galerii znajduje się w app.js, a treść produktów w data.js.
+
+ Najszybsze poruszanie się po pliku:
+   1. Naciśnij Cmd + F na Macu (Ctrl + F na Windowsie).
+   2. Wpisz numer sekcji, np. [CSS-05].
+
+ [CSS-01] Kolory, odstępy i ustawienia wspólne dla całej strony
+ [CSS-02] Górna nawigacja, przyciski i licznik koszyka
+ [CSS-03] Sekcja powitalna HERO
+ [CSS-04] Najpopularniejsze, filtry i wyszukiwarka
+ [CSS-05] Kategorie menu i karty produktów
+ [CSS-06] Instrukcja zamówienia oraz FAQ
+ [CSS-07] Wysuwany panel zamówienia / koszyka
+ [CSS-08] Okno kontaktowe oraz strona regulaminu
+ [CSS-09] Stopka i galeria realizacji
+ [CSS-10] Widok na tabletach i telefonach
+
+ WAŻNE:
+ - kolory najlepiej zmieniać w :root, zamiast szukać ich w całym pliku;
+ - selektory z klasą .is-open, .is-active lub .is-show są przełączane przez JS;
+ - reguły @media na końcu nadpisują wygląd dla mniejszych ekranów;
+ - nie usuwaj klas tylko dlatego, że nie widzisz ich bezpośrednio w index.html:
+   część kart i elementów koszyka jest tworzona dynamicznie w app.js.
+===============================================================================
+*/
+
+/*
+===============================================================================
+ [CSS-01] FUNDAMENTY: KOLORY, ROZMIARY I USTAWIENIA GLOBALNE
+===============================================================================
+ :root działa jak mały panel sterowania wyglądem strony. Zmieniając jedną
+ zmienną, np. --brand, zmieniasz główny kolor w wielu miejscach jednocześnie.
+
+ Najczęściej zmieniane wartości:
+   --bg          tło całej strony,
+   --text        podstawowy kolor tekstu,
+   --muted       spokojniejszy tekst opisowy,
+   --brand       główny kolor marki i przycisków,
+   --radius      zaokrąglenie kart,
+   --section-pad pionowy odstęp między sekcjami.
+===============================================================================
+*/
 :root {
   /* tło: bardzo delikatny krem (prawie białe) */
   --bg: #fdfbf8;
@@ -89,6 +136,22 @@ summary:focus-visible,
   font-size: .78rem
 }
 
+/*
+===============================================================================
+ [CSS-02] GÓRNA NAWIGACJA, PRZYCISKI I LICZNIK KOSZYKA
+===============================================================================
+ .top jest przyklejonym paskiem nawigacji. Klasa .nav-open jest dodawana przez
+ JavaScript po kliknięciu hamburgera na telefonie. Wszystkie warianty .btn--...
+ korzystają z bazowej klasy .btn, dlatego ogólny wygląd przycisków najlepiej
+ zmieniać właśnie w .btn, a nie osobno w każdym wariancie.
+
+ Powiązania:
+   .navToggle          przycisk hamburgera,
+   .top.nav-open       stan otwartego menu mobilnego,
+   .orderBtn           przycisk otwierający koszyk,
+   .count--bump        krótka animacja licznika po dodaniu produktu.
+===============================================================================
+*/
 .top {
   position: sticky;
   top: 0;
@@ -280,6 +343,7 @@ summary:focus-visible,
 }
 
 /* Na małych ekranach zostaje sam koszyk + licznik */
+/* Pierwsza mała poprawka mobilna: wygodne przyciski i krótszy napis koszyka. */
 @media (max-width: 520px) {
   .orderBtn__label {
     display: none;
@@ -314,6 +378,16 @@ summary:focus-visible,
   }
 }
 
+/*
+===============================================================================
+ [CSS-03] SEKCJA POWITALNA HERO
+===============================================================================
+ Hero to pierwszy ekran strony: nagłówek, krótki opis, dwa przyciski i odznaki.
+ Na dużym ekranie może mieć dwie kolumny, natomiast klasa .hero--wide ustawia
+ jedną szeroką kolumnę. Na telefonie przyciski CTA zajmują całą szerokość,
+ dzięki czemu łatwiej trafić w nie palcem.
+===============================================================================
+*/
 .hero {
   display: grid;
   grid-template-columns: 1.15fr .85fr;
@@ -380,6 +454,18 @@ h1 span {
   color: var(--muted);
 }
 
+/*
+===============================================================================
+ [CSS-04] NAJPOPULARNIEJSZE, FILTRY I WYSZUKIWARKA
+===============================================================================
+ .hero__card i .miniList tworzą listę popularnych pozycji. Kliknięcie pozycji
+ przenosi użytkownika do odpowiadającej jej karty w katalogu. .card--flash daje
+ wtedy krótkie podświetlenie. Niżej .controls zawiera przyciski kategorii
+ (.seg__btn) oraz pole wyszukiwania.
+
+ Stan .is-active nie jest stały — ustawia go app.js dla wybranego filtra.
+===============================================================================
+*/
 .hero__card {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -499,6 +585,27 @@ h1 span {
   box-shadow: 0 6px 16px rgba(16, 24, 40, .04);
 }
 
+/*
+===============================================================================
+ [CSS-05] KATALOG, KATEGORIE I KARTY PRODUKTÓW
+===============================================================================
+ Katalog jest budowany przez JavaScript na podstawie PRODUCTS z data.js.
+ Dlatego klas takich jak .card, .thumb, .buyRow czy .optRow możesz nie znaleźć
+ jako gotowego HTML-a w index.html — powstają dopiero podczas uruchomienia.
+
+ Najważniejsze elementy:
+   .acc details     rozwijana kategoria menu,
+   .grid            siatka produktów w kategorii,
+   .card            pojedynczy produkt,
+   .thumb__img      zdjęcie produktu (object-fit: cover przycina je do ramki),
+   .pill / .pTag    małe etykiety, np. „wege” albo liczba porcji,
+   .optRow          wybór smaku, rozmiaru lub ilości,
+   .add             przycisk dodania do koszyka.
+
+ content-visibility pozwala przeglądarce pominąć rysowanie kategorii daleko
+ poza ekranem. Same obrazy mają dodatkowo loading="lazy" ustawiane w app.js.
+===============================================================================
+*/
 .catalog {
   padding: var(--section-pad) 0
 }
@@ -578,10 +685,16 @@ h2 {
 }
 
 .thumb--photo {
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   position: relative;
+  overflow: hidden;
+}
+
+.thumb__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .thumb--photo::after {
@@ -599,6 +712,12 @@ h2 {
   color: rgba(16, 24, 40, .85);
   background: rgba(255, 255, 255, .78);
   border: 1px solid rgba(255, 255, 255, .9);
+}
+
+/* Przeglądarki z obsługą content-visibility pomijają malowanie odległych sekcji. */
+.acc details {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 700px;
 }
 
 .pTag {
@@ -685,6 +804,45 @@ h2 {
   filter: brightness(.92);
 }
 
+/* Stan używany po ustawieniu ORDERS_ENABLED = false w app.js. */
+.add:disabled,
+.orderBtn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  filter: grayscale(.15);
+  transform: none;
+}
+
+/*
+  Komunikat tworzony przez app.js, gdy ORDERS_ENABLED = false.
+  Linki nadal umożliwiają zwykły kontakt, ale nie wysyłają koszyka.
+*/
+.ordersDisabledNotice {
+  display: grid;
+  gap: .25rem;
+  margin-top: 1rem;
+  padding: .9rem 1rem;
+  border: 1px solid rgba(142, 31, 31, .28);
+  border-radius: 14px;
+  background: var(--brandSoft);
+  color: var(--text);
+}
+
+.ordersDisabledNotice strong {
+  color: var(--brand);
+}
+
+.ordersDisabledNotice a {
+  color: var(--brand);
+  font-weight: 900;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ordersDisabledNotice[hidden] {
+  display: none;
+}
+
 /* feedback po dodaniu do koszyka */
 .add.is-added {
   background: #1a7f37;
@@ -742,6 +900,15 @@ h2 {
   opacity: .65;
 }
 
+/*
+===============================================================================
+ [CSS-06] JAK ZAMÓWIĆ ORAZ FAQ
+===============================================================================
+ .how__grid układa trzy kroki zamówienia, a .faq__grid pytania i odpowiedzi.
+ Obie sekcje przechodzą z kilku kolumn do jednej w regułach mobilnych na końcu
+ pliku. Element <details> sam obsługuje rozwijanie FAQ bez dodatkowego JS.
+===============================================================================
+*/
 .how {
   padding: var(--section-pad) 0
 }
@@ -797,6 +964,25 @@ details p {
   margin: .6rem 0 0
 }
 
+/*
+===============================================================================
+ [CSS-07] WYSUWANY PANEL ZAMÓWIENIA / KOSZYKA
+===============================================================================
+ Panel jest domyślnie schowany poza prawą krawędzią przez right: -520px.
+ app.js dodaje klasę .is-open i zmienia położenie na right: 0. W środku są:
+
+   .panel__meta       data, godzina, odbiór/dowóz i adres,
+   .orderChecklist   lista rzeczy potrzebnych do wysłania zamówienia,
+   .panel__items      produkty zapisane w koszyku,
+   .lineItem          pojedyncza pozycja zamówienia,
+   .qty               przyciski zmiany liczby sztuk,
+   .panel__bottom     suma oraz przycisk wysłania wiadomości,
+   .warn              komunikat o brakujących danych.
+
+ Klasy .is-done, .is-complete i .is-show są stanami ustawianymi przez JS.
+ Nie wpisuj ich na stałe do HTML-a, bo mają reagować na działania użytkownika.
+===============================================================================
+*/
 .panel {
   position: fixed;
   top: 0;
@@ -838,6 +1024,52 @@ details p {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: .8rem;
+}
+
+.orderChecklist {
+  padding: .85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(142, 31, 31, .045);
+}
+
+.orderChecklist strong {
+  display: block;
+  margin-bottom: .45rem;
+  font-size: .9rem;
+}
+
+.orderChecklist ul {
+  display: grid;
+  gap: .3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.orderChecklist li {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+.orderChecklist li span {
+  width: 1rem;
+  color: var(--brand);
+  font-weight: 900;
+}
+
+.orderChecklist li.is-done {
+  color: var(--text);
+  text-decoration: line-through;
+  text-decoration-color: rgba(16, 24, 40, .25);
+}
+
+.orderChecklist.is-complete {
+  border-color: rgba(34, 197, 94, .45);
+  background: rgba(34, 197, 94, .08);
 }
 
 .field {
@@ -1047,7 +1279,19 @@ details p {
   transform: translateY(-2px);
 }
 
-/* ===== MODAL KONTAKT ===== */
+/*
+===============================================================================
+ [CSS-08] OKNO KONTAKTOWE ORAZ STRONA REGULAMINU
+===============================================================================
+ Modal jest niewidoczny, dopóki JavaScript nie doda .is-open. Składa się z
+ przyciemnionego tła (.modal__backdrop) i właściwej karty (.modal__card).
+ Sekcja .legal poniżej jest współdzielonym stylem dla regulamin.html.
+
+ Jeżeli powiększasz modal, pilnuj wartości width: min(...), żeby nadal mieścił
+ się na telefonie. Nie usuwaj warstwy backdrop — pozwala zamknąć okno kliknięciem
+ poza kartą i wizualnie oddziela modal od strony.
+===============================================================================
+*/
 .modal {
   position: fixed;
   inset: 0;
@@ -1178,6 +1422,19 @@ details p {
   margin: .4rem 0;
 }
 
+/*
+===============================================================================
+ [CSS-09] STOPKA I GALERIA REALIZACJI
+===============================================================================
+ Stopka zawiera dane firmy, linki i galerię. Galeria ma osobne karty .fbCard,
+ ponieważ może korzystać zarówno ze zdjęć lokalnych, jak i danych pobranych
+ z zewnętrznego źródła. .fbCard--hidden ukrywa dalsze zdjęcia na komputerze,
+ a przycisk .fbToggle pokazuje je na żądanie.
+
+ Na telefonie galeria zmienia się w poziomą karuzelę przewijaną palcem. To jest
+ celowe: użytkownik nie dostaje bardzo długiej pionowej listy zdjęć.
+===============================================================================
+*/
 .footer {
   border-top: 1px solid var(--line);
   padding: 1.6rem 0;
@@ -1257,10 +1514,11 @@ details p {
 }
 
 .fbImg {
+  display: block;
+  width: 100%;
   height: 120px;
   background: var(--soft);
-  background-size: cover;
-  background-position: center;
+  object-fit: cover;
 }
 
 .fbBody {
@@ -1319,6 +1577,20 @@ details p {
   width: 100%;
 }
 
+/*
+===============================================================================
+ [CSS-10] RESPONSYWNOŚĆ — TABLETY I TELEFONY
+===============================================================================
+ @media stosuje reguły tylko wtedy, gdy ekran jest węższy od podanej wartości:
+   900px  — tablet i telefon: mniej kolumn, menu hamburgerowe,
+   720px  — filtry i wyszukiwarka ustawione jeden pod drugim,
+   520px  — telefon: poziome karuzele i większe pola dotykowe.
+
+ Kolejność ma znaczenie. Reguły zapisane niżej mogą nadpisać wcześniejsze.
+ Jeśli coś wygląda dobrze na komputerze, ale źle na telefonie, najpierw szukaj
+ właściwej reguły właśnie w tej sekcji.
+===============================================================================
+*/
 @media (max-width: 900px) {
   .fbGrid {
     grid-template-columns: 1fr 1fr;

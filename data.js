@@ -1,16 +1,51 @@
+/*
+  ============================================================================
+  MAPA PLIKU data.js — NAJWAŻNIEJSZY PLIK DO CODZIENNYCH ZMIAN
+  ============================================================================
+  Ten plik przechowuje treść oferty. Nie steruje wyglądem ani kliknięciami.
+
+  Użyj ⌘ + F i wyszukaj:
+  [DATA-01] Numer telefonu i link do Facebooka
+  [DATA-02] Zajęte terminy
+  [DATA-03] Nazwy tagów/kategorii
+  [DATA-04] Wszystkie produkty, ceny i zdjęcia
+  [DATA-05] Galeria na pierwszym ekranie
+
+  ZASADY:
+  - po każdej pozycji w tablicy zostaw przecinek,
+  - id produktu musi być unikalne,
+  - cena jest liczbą bez "zł", np. price: 75,
+  - ścieżka img jest liczona od index.html,
+  - ustaw available: false, aby tymczasowo ukryć produkt bez jego usuwania,
+  - ustaw popular: true, aby produkt pojawił się w Najpopularniejszych.
+  ============================================================================
+*/
+
+/*
+  [DATA-01] PODSTAWOWE DANE FIRMY
+  Numer dla WhatsAppa wpisujemy bez plusa i spacji. Pamiętaj, że numer telefonu
+  występuje też bezpośrednio w index.html, regulamin.html i danych SEO.
+*/
 const SITE_CONFIG = {
   phone: "48537388889",
   facebookUrl: "https://www.facebook.com/justyna.obara/photos",
   businessName: "Paterka",
 };
 
+/*
+  [DATA-02] ZAJĘTE TERMINY
+  Format to RRRR-MM-DD, np. "2026-12-24". Klient nie wyśle zamówienia na datę
+  z tej listy. To rozwiązanie statyczne — po zmianie trzeba ponownie opublikować
+  stronę. Nie wpisuj zakresu dat jednym tekstem; każda data to osobny wiersz.
+*/
 const BOOKED_DATES = [
-  "2024-12-24",
-  "2024-12-25",
-  "2024-12-26",
-  "2026-06-08",
 ];
 
+/*
+  [DATA-03] TŁUMACZENIE TAGÓW
+  Lewa strona (np. cold) jest używana w kodzie i data-filter w index.html.
+  Prawa strona jest tekstem pokazywanym klientowi na karcie produktu.
+*/
 const TAG_LABELS = {
   cold: "na zimno",
   hot: "na ciepło",
@@ -20,6 +55,22 @@ const TAG_LABELS = {
   plyta: "zimna płyta",
 };
 
+/*
+  [DATA-04] PRODUKTY
+  Każdy obiekt między { } opisuje jeden produkt:
+  id        — unikalny numer używany przez koszyk,
+  name      — nazwa widoczna na karcie i w wiadomości,
+  tags      — jedna lub kilka kategorii, np. ["cold", "vege"],
+  serves    — orientacyjna liczba osób,
+  price     — cena liczbowa,
+  note      — skład; <br> oznacza przejście do nowej linii,
+  img       — zdjęcie z folderu assets,
+  available — false ukrywa produkt,
+  popular   — true pokazuje produkt w sekcji Najpopularniejsze.
+
+  Niektóre produkty mają dodatkowo sizes, flavors albo qtyInput. app.js wykrywa
+  te pola automatycznie i tworzy odpowiednie listy wyboru.
+*/
 const PRODUCTS = [
     {
     id: 1,
@@ -530,7 +581,7 @@ const PRODUCTS = [
   },
   {
     id: 34,
-    name: "Wegetariańskie",
+    name: "Koryto Wegetariańskie",
     tags: ["hot"],
     serves: "2",
     price: 85,
@@ -647,6 +698,11 @@ const PRODUCTS = [
   },
 ];
 
+/*
+  [DATA-05] GALERIA NA PIERWSZYM EKRANIE
+  Tutaj podajesz zdjęcie, krótki opis, link po kliknięciu i datę. Elementy są
+  generowane przez app.js. Najlepiej użyć różnych, lekkich zdjęć WebP/JPEG.
+*/
 const LOCAL_GALLERY = [
   {
     img: "assets/patera1.jpg",
