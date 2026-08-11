@@ -633,12 +633,12 @@ function applyOrderingAvailability(){
     notice.className = 'ordersDisabledNotice';
     notice.setAttribute('role', 'status');
     notice.innerHTML = `
-      <strong>Zamawianie przez stronę jest chwilowo niedostępne.</strong>
+      <strong>Zamawianie przez stronę jest na razie niedostępne.</strong>
       <span>
-        Prosimy o kontakt przez
+        Zapraszam do kontaktu przez
         <a href="https://wa.me/${WA_NUMBER}" target="_blank" rel="noopener">WhatsApp</a>
         lub
-        <a href="${SITE_CONFIG.facebookUrl}" target="_blank" rel="noopener">Facebooka</a>.
+        <a href="${SITE_CONFIG.facebookUrl}" target="_blank" rel="noopener">Facebooka</a> :).
       </span>
     `;
 
